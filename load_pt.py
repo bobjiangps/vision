@@ -9,7 +9,7 @@ from utils.plots import colors, plot_one_box
 
 if __name__ == "__main__":
     weights_file = "./resource/models/elements.pt"
-    img_file = "./resource/img/screen.png"
+    img_file = "./resource/img/login.jpeg"
     conf_thres = 0.25
     iou_thres = 0.45
     classes = None
