@@ -1,0 +1,9 @@
+model:
+  weights: elements
+  img: page
+  confidence: 0.25
+  iou: 0.45
+  classes:
+  agnostic_nms:
+  max_det: 100
+  line_thickness: 3
