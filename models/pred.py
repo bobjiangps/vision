@@ -13,7 +13,7 @@ def init_model(device=torch.device("cpu")):
     return model
 
 
-def predict_label(model, device=torch.device("cpu")):
+def predict(model, device=torch.device("cpu")):
     config = LoadConfig().model
     stride = int(model.stride.max())
     imgsz = check_img_size(640, s=stride)
@@ -41,6 +41,6 @@ def predict_label(model, device=torch.device("cpu")):
                         label_store[names[c]] += 1
                     else:
                         label_store[names[c]] = 1
-                    results.append({"label": names[c], "PR": f"{conf:.2f}", "COOR": (int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3]))})
-            print(f'{s}Predict Done. ({t2 - t1:.3f}s)')
+                    results.append({"N": names[c], "PR": f"{conf:.2f}", "COOR": (int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3]))})
+            print(f'{s}Done. ({t2 - t1:.3f}s)')
     return results, label_store
