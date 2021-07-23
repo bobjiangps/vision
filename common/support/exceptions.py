@@ -1,6 +1,6 @@
 class CustomException(Exception):
 
-    def __init__(self, msg, trace=None):
+    def __init__(self, msg="", trace=None):
         self.msg = msg
         self.trace = trace
 
