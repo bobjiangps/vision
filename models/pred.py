@@ -9,7 +9,7 @@ from pathlib import Path
 
 def init_model(device=torch.device("cpu")):
     config = LoadConfig().model
-    model = attempt_load(Path(__file__).absolute().parent.parent.joinpath("resource", "models", f"{config['weights']}.pt"), map_location=device)
+    model = attempt_load(Path.cwd().joinpath("resource", "models", f"{config['weights']}.pt"), map_location=device)
     return model
 
 
@@ -18,7 +18,7 @@ def predict(model, device=torch.device("cpu")):
     stride = int(model.stride.max())
     imgsz = check_img_size(640, s=stride)
     names = model.module.names if hasattr(model, 'module') else model.names
-    dataset = LoadImages(Path(__file__).absolute().parent.parent.joinpath("resource", "img", f"{config['img']}.png"), img_size=imgsz, stride=stride)
+    dataset = LoadImages(Path.cwd().joinpath("resource", "img", f"{config['img']}.png"), img_size=imgsz, stride=stride)
     label_store = {}
     results = []
     for path, img, im0s, vid_cap in dataset:

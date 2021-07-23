@@ -10,7 +10,10 @@ class WebAction(CustomWait):
         self._model = model
 
     def wait_until_text_display(self, text):
-        self.until(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
+        return self.until(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
 
-    def wait_until_element_display(self, element, keyword):
-        pass
+    def wait_until_element_display(self, element, keyword=None):
+        message = f"cannot see --{element}-- on page"
+        if keyword:
+            message += f" with keyword --{keyword}--"
+        return self.until(ElementDisplayOnPage(self._model, element, keyword), message)
