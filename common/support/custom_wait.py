@@ -9,7 +9,8 @@ IGNORED_EXCEPTIONS = (NotVisibleException,)
 
 class CustomWait:
 
-    def __init__(self, timeout=30, frequency=0.5, ignored_exceptions=None):
+    def __init__(self, driver, timeout=30, frequency=0.5, ignored_exceptions=None):
+        self._driver = driver
         self._timeout = timeout
         self._frequency = frequency
         exceptions = list(IGNORED_EXCEPTIONS)
@@ -25,7 +26,7 @@ class CustomWait:
         trace = None
         while time.time() <= end_time:
             try:
-                value = method()
+                value = method(self._driver)
                 if value:
                     return value
             except self._ignored_exceptions:
@@ -37,7 +38,7 @@ class CustomWait:
         end_time = time.time() + self._timeout
         while time.time() <= end_time:
             try:
-                value = method()
+                value = method(self._driver)
                 if not value:
                     return value
             except self._ignored_exceptions:
