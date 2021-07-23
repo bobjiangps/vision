@@ -1,5 +1,6 @@
 from utils.image_processor import ImageProcessor as IP
 from common.support.exceptions import NotVisibleException
+from models.pred import predict
 from pathlib import Path
 from conf.config import LoadConfig
 
@@ -16,9 +17,35 @@ class TextDisplayOnPage(BaseExpectation):
         super(TextDisplayOnPage, self).__init__()
         self.text = text
 
-    def __call__(self):
+    def __call__(self, driver):
+        driver.save_screenshot(self._img)
         contours = IP.recognize_contours(self._img)
         for c in contours:
             if c[1].find(self.text) >= 0:
                 return c[0]
-        raise NotVisibleException("text NOT visible")
+        # raise NotVisibleException("text NOT visible")
+        return False
+
+
+class ElementDisplayOnPage(BaseExpectation):
+
+    def __init__(self, model, element, keyword=None):
+        super(ElementDisplayOnPage, self).__init__()
+        self.model = model
+        self.element = element.lower()
+        self.keyword = keyword
+
+    def __call__(self, driver):
+        driver.save_screenshot(self._img)
+        results, labels = predict(self.model)
+        if self.element not in labels.keys():
+            return False
+        for r in results:
+            if r["N"] == self.element:
+                if self.keyword:
+                    if IP.recognize_crop_contours(self._img, r["COOR"]).find(self.keyword) >= 0:
+                        return r["COOR"]
+                else:
+                    return r["COOR"]
+        # raise NotVisibleException("text NOT visible")
+        return False
