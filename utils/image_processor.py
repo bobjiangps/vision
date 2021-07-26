@@ -19,11 +19,10 @@ class ImageProcessor:
             cropped = img_copy[y:y + h, x:x + w]
             s = ptr.image_to_string(cropped).strip()
             results.append(((x, y, x + w, y + h), s))
-        return results
+        return results, img.shape
 
     @classmethod
     def recognize_crop_contours(cls, img, crop):
         img = cv2.imread(img)
         crop_img = img[crop[1]:crop[3], crop[0]:crop[2]].copy()
         return ptr.image_to_string(crop_img).strip()
-

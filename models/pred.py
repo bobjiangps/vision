@@ -21,6 +21,7 @@ def predict(model, device=torch.device("cpu")):
     dataset = LoadImages(Path.cwd().joinpath("resource", "img", f"{config['img']}.png"), img_size=imgsz, stride=stride)
     label_store = {}
     results = []
+    shape = None
     for path, img, im0s, vid_cap in dataset:
         img = torch.from_numpy(img).to(device)
         img = img.float()
@@ -33,6 +34,7 @@ def predict(model, device=torch.device("cpu")):
         t2 = time_synchronized()
         for i, det in enumerate(pred):
             p, s, im0, frame = path, '', im0s.copy(), getattr(dataset, 'frame', 0)
+            shape = im0.shape
             if len(det):
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
                 for *xyxy, conf, cls in reversed(det):
@@ -43,4 +45,4 @@ def predict(model, device=torch.device("cpu")):
                         label_store[names[c]] = 1
                     results.append({"N": names[c], "PR": f"{conf:.2f}", "COOR": (int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3]))})
             print(f'{s}Done. ({t2 - t1:.3f}s)')
-    return results, label_store
+    return results, label_store, shape

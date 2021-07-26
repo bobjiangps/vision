@@ -46,8 +46,8 @@ def xywh2xyxy(x):
 
 def scale_coords(img1_shape, coords, img0_shape, ratio_pad=None):
     if ratio_pad is None:
-        gain = min(img1_shape[0] / img0_shape[0], img1_shape[1] / img0_shape[1])  # gain  = old / new
-        pad = (img1_shape[1] - img0_shape[1] * gain) / 2, (img1_shape[0] - img0_shape[0] * gain) / 2  # wh padding
+        gain = min(img1_shape[0] / img0_shape[0], img1_shape[1] / img0_shape[1])
+        pad = (img1_shape[1] - img0_shape[1] * gain) / 2, (img1_shape[0] - img0_shape[0] * gain) / 2
     else:
         gain = ratio_pad[0][0]
         pad = ratio_pad[1]
@@ -137,3 +137,14 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
             break
 
     return output
+
+
+def center(position):
+    return [int((position[2] + position[0]) / 2), int((position[3] + position[1]) / 2)]
+
+
+def proportion(point, window_size, img_size):
+    w_ratio = img_size[1] / window_size[0]
+    h_ratio = img_size[0] / window_size[1]
+    new_point = (point[0] / w_ratio, point[1] / h_ratio)
+    return new_point
