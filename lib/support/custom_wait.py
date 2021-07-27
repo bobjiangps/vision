@@ -1,7 +1,7 @@
 import time
 import traceback
-from common.support.exceptions import NotVisibleException
-from common.support.exceptions import TimeoutException
+from lib.support.exceptions import NotVisibleException
+from lib.support.exceptions import TimeoutException
 
 
 IGNORED_EXCEPTIONS = (NotVisibleException,)

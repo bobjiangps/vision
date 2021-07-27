@@ -1,4 +1,4 @@
-from common.singleton import Singleton
+from lib.singleton import Singleton
 from utils.yaml_helper import YamlHelper
 from pathlib import Path
 
