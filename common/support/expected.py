@@ -50,8 +50,9 @@ class ElementDisplayOnPage(BaseExpectation):
         for r in results:
             if r["N"] == self.element:
                 if self.keyword:
-                    if IP.recognize_crop_contours(self._img, r["COOR"]).find(self.keyword) >= 0:
-                        return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
+                    for k in self.keyword.split("|"):
+                        if IP.recognize_crop_contours(self._img, r["COOR"]).find(k.strip()) >= 0:
+                            return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
                 else:
                     return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
         # raise NotVisibleException("text NOT visible")
