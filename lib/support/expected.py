@@ -1,5 +1,5 @@
 from utils.image_processor import ImageProcessor as IP
-from common.support.exceptions import NotVisibleException
+from lib.support.exceptions import NotVisibleException
 from models.pred import predict
 from pathlib import Path
 from conf.config import LoadConfig
@@ -17,6 +17,12 @@ class BaseExpectation:
         height = driver.execute_script("return window.innerHeight;")
         return [width, height]
 
+    @staticmethod
+    def get_body_size(driver):
+        body = driver.find_element_by_tag_name("body")
+        size = body.size
+        return [size["width"], size["height"]]
+
 
 class TextDisplayOnPage(BaseExpectation):
 
@@ -28,8 +34,9 @@ class TextDisplayOnPage(BaseExpectation):
         driver.save_screenshot(self._img)
         contours, shape = IP.recognize_contours(self._img)
         for c in contours:
-            if c[1].find(self.text) >= 0:
-                return proportion(center(c[0]), self.get_viewport_size(driver), shape)
+            for t in self.text.split("|"):
+                if c[1].find(t.strip()) >= 0:
+                    return proportion(center(c[0]), self.get_viewport_size(driver), shape)
         # raise NotVisibleException("text NOT visible")
         return False
 
