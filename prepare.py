@@ -3,6 +3,7 @@ from selenium import webdriver
 from lib.action.web import WebAction
 from lib.elements.button import Button
 from lib.elements.static import Static
+from lib.elements.text_field import TextField
 
 
 class Preparation:
@@ -18,6 +19,7 @@ class Preparation:
         self.offset, _ = self.wa.check_offset()
         self.button = Button(self.driver, self.wa, self.offset)
         self.static = Static(self.driver, self.wa, self.offset)
+        self.text_field = TextField(self.driver, self.wa, self.offset)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.driver.quit()

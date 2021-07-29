@@ -4,6 +4,7 @@ from prepare import Preparation
 class WebTest(Preparation):
     def run(self):
         self.static("Login ID | Login name").input("test@test.com")
+        # self.text_field("Login name").input("test")
         self.button("Login | Sign in").click()
         input("press any key")
 
