@@ -3,7 +3,7 @@ from lib.elements.base import ElementBase
 
 class Button(ElementBase):
 
-    element_type = "Button"
+    element_type = __qualname__
 
     def __call__(self, keyword=None):
         self.keyword = keyword

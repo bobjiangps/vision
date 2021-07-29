@@ -3,7 +3,7 @@ from lib.elements.base import ElementBase
 
 class Static(ElementBase):
 
-    element_type = "Static"
+    element_type = __qualname__
 
     def __call__(self, text):
         self.text = text
