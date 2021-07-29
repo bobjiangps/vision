@@ -1,4 +1,3 @@
-from selenium.webdriver.common.action_chains import ActionChains
 from lib.elements.base import ElementBase
 
 
@@ -10,7 +9,10 @@ class Static(ElementBase):
         self.text = text
         return self
 
+    def click(self):
+        element = self.wait_text_visible(text=self.text)
+        self.action_click(element)
+
     def input(self, value):
         element = self.wait_text_visible(text=self.text)
-        body = self._driver.find_element_by_tag_name("body")
-        ActionChains(self._driver).move_to_element_with_offset(body, element[0], element[1] + self._offset[1]).click().send_keys(value).perform()
+        self.action_input(element, value)
