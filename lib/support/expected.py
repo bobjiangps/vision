@@ -3,7 +3,7 @@ from lib.support.exceptions import NotVisibleException
 from models.pred import predict
 from pathlib import Path
 from conf.config import LoadConfig
-from utils.general import center, proportion
+from utils.general import center, proportion, distance_by_direction
 
 
 class BaseExpectation:
@@ -64,3 +64,48 @@ class ElementDisplayOnPage(BaseExpectation):
                     return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
         # raise NotVisibleException("text NOT visible")
         return False
+
+
+class ElementMatchOnPage(BaseExpectation):
+
+    def __init__(self, model, element, keyword, direction="Down"):
+        super(ElementMatchOnPage, self).__init__()
+        self.model = model
+        self.element = element.lower()
+        self.keyword = keyword
+        self.direction = direction
+
+    def __call__(self, driver):
+        driver.save_screenshot(self._img)
+        match_keyword = None
+        contours, shape = IP.recognize_contours(self._img)
+        for c in contours:
+            for t in self.keyword.split("|"):
+                if c[1].find(t.strip()) >= 0:
+                    match_keyword = proportion(center(c[0]), self.get_viewport_size(driver), shape)
+        if not match_keyword:
+            return False
+        results, labels, shape = predict(self.model)
+        if self.element not in labels.keys():
+            return False
+        elements = []
+        for r in results:
+            if r["N"] == self.element:
+                elements.append(r["COOR"])
+        matched_element = None
+        distance = None
+        for e in elements:
+            position = proportion(center(e), self.get_viewport_size(driver), shape)
+            if not matched_element:
+                distance = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
+                matched_element = e
+            else:
+                temp = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
+                if temp < distance:
+                    matched_element = e
+        final_match = [match_keyword[0], match_keyword[1]]
+        if matched_element:
+            beyond_distance = proportion(distance_by_direction(matched_element, self.direction), self.get_viewport_size(driver), shape)
+            final_match[0] += beyond_distance[0]
+            final_match[1] += beyond_distance[1]
+        return final_match

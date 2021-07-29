@@ -15,6 +15,9 @@ class ElementBase:
     def wait_element_visible(self, **kwargs):
         return self._action.wait_until_element_display(kwargs["element"], kwargs.get("keyword", None))
 
+    def wait_element_match_visible(self, **kwargs):
+        return self._action.wait_until_element_match(kwargs["element"], kwargs["keyword"])
+
     def action_click(self, element):
         body = self._driver.find_element_by_tag_name("body")
         self.action_chains.move_to_element_with_offset(body, element[0],

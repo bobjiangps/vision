@@ -148,3 +148,10 @@ def proportion(point, window_size, img_size):
     h_ratio = img_size[0] / window_size[1]
     new_point = (point[0] / w_ratio, point[1] / h_ratio)
     return new_point
+
+
+def distance_by_direction(position, direction):
+    if direction == "Down":
+        return [int((position[2] - position[0]) / 2), int((position[3] - position[1]) / 2 + 10)]
+    elif direction == "Right":
+        return [int((position[2] - position[0]) / 2 + 10), int((position[3] - position[1]) / 2)]

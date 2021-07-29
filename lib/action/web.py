@@ -20,6 +20,10 @@ class WebAction(CustomWait):
             message += f" with keyword --{keyword}--"
         return self.until(ElementDisplayOnPage(self._model, element, keyword), message)
 
+    def wait_until_element_match(self, element, keyword):
+        message = f"cannot see --{element}-- on page with keyword --{keyword}--"
+        return self.until(ElementMatchOnPage(self._model, element, keyword), message)
+
     def check_offset(self):
         v_size = BaseExpectation.get_viewport_size(self._driver)
         b_size = BaseExpectation.get_body_size(self._driver)
