@@ -29,5 +29,6 @@ class ImageProcessor:
         if result == "":
             crop_img = cv2.bitwise_not(crop_img)
             _, binary = cv2.threshold(crop_img, 150, 255, cv2.THRESH_BINARY)
-            result = ptr.image_to_string(binary, config="--oem 3 --psm 4").strip()
+            # result = ptr.image_to_string(binary, config="--oem 3 --psm 4").strip()
+            result = ptr.image_to_string(binary, config="--oem 3 --psm 6").strip()
         return result
