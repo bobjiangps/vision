@@ -15,7 +15,7 @@ def pytest_configure():
 @pytest.fixture(scope="function")
 def web():
     web_test = type('web_test', (), {})()
-    url = "https://apm.activecommunities.com/linux13/ActiveNet_Login"
+    url = ""
     driver = webdriver.Chrome()
     driver.get(url)
     action = WebAction(driver, getattr(pytest, "model"))
@@ -29,6 +29,4 @@ def web():
     setattr(web_test, "static", static)
     setattr(web_test, "text_field", text_field)
     yield web_test
-    print("exit driver")
-    driver.close()
     driver.quit()
