@@ -44,5 +44,5 @@ def predict(model, device=torch.device("cpu")):
                     else:
                         label_store[names[c]] = 1
                     results.append({"N": names[c], "PR": f"{conf:.2f}", "COOR": (int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3]))})
-            print(f'{s}Done. ({t2 - t1:.3f}s)')
+            print(f'{s}Predict Done. ({t2 - t1:.3f}s)')
     return results, label_store, shape

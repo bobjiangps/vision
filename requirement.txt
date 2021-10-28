@@ -15,6 +15,7 @@ pytesseract==0.3.8
 pytest==6.2.5
 pytest-html==3.1.1
 pytest-metadata==1.11.0
+pytest-rerunfailures==10.2
 python-dateutil==2.8.2
 pytz==2021.1
 PyYAML==5.4.1
