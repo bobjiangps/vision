@@ -7,3 +7,14 @@ model:
   agnostic_nms:
   max_det: 100
   line_thickness: 3
+command_parameter:
+  environment: QA
+  browser:
+  test:
+  exclude_test:
+  tag:
+  keyword: login
+  marker:
+  mobile_platform:
+  device:
+  log_level: DEBUG
