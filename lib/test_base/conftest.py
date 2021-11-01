@@ -1,4 +1,6 @@
 import pytest
+import logging
+import os
 from models.pred import *
 from utils.selenium_utils import SeleniumUtils
 from lib.action.web import WebAction
@@ -28,7 +30,8 @@ def pytest_configure(config):
 
 
 @pytest.fixture(scope="function")
-def web():
+def web(logger):
+    logger.info("Start web test.......")
     web_test = type('web_test', (), {})()
     command_data = getattr(pytest, "command_data")
     url = ""
@@ -36,7 +39,15 @@ def web():
     action = WebAction(driver, getattr(pytest, "model"))
     setattr(web_test, "_driver", driver)
     setattr(web_test, "action", action)
+    setattr(web_test, "log", logger)
     setattr(pytest, "web_test", web_test)
     action.browse_page(url)
     yield web_test
+    logger.info("Exit web test.......")
     SeleniumUtils.quit_driver()
+
+
+@pytest.fixture()
+def logger():
+    current_log = logging.getLogger(os.environ.get('PYTEST_CURRENT_TEST').split('::')[-2].split(' ')[0])
+    return current_log
