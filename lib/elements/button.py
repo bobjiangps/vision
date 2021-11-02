@@ -3,12 +3,11 @@ from lib.elements.base import ElementBase
 
 class Button(ElementBase):
 
-    element_type = __qualname__
-
     def __call__(self, keyword=None):
         self.keyword = keyword
+        self.element_type = self.__class__.__qualname__
         return self
 
     def click(self):
-        btn = self.wait_element_visible(element=self.element_type, keyword=self.keyword)
+        btn = self.wait_element_visible()
         self.action_click(btn)
