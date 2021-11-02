@@ -49,7 +49,4 @@ class LoadConfig(Singleton):
                             help="a string that indicates which mobile system to run mobile app test")
         parser.add_argument("-d", "--device", metavar="Device", type=str,
                             help="a string that indicates which device to run mobile app test")
-        parser.add_argument("-ll", "--log_level", metavar="DEBUG", type=str, default="DEBUG",
-                            choices=["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG", "NOTEST"],
-                            help="a string about log level to show log")
         return parser.parse_args().__dict__
