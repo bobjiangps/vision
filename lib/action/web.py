@@ -33,6 +33,16 @@ class WebAction(CustomWait):
             self.log.info(f"Wait the element [{element}] to display")
         return self.until(ElementDisplayOnPage(self._model, element, keyword), message)
 
+    def wait_until_element_disappear(self, element, keyword=None):
+        message = f"The element --{element}-- still display on page"
+        if keyword:
+            message += f" with keyword --{keyword}--"
+            self.log.info(f"Wait the element [{element}] identified by [{keyword}] to disappear")
+        else:
+            self.log.info(f"Wait the element [{element}] to disappear")
+        return self.until_not(ElementDisplayOnPage(self._model, element, keyword), message)
+
+
     def wait_until_element_match(self, element, keyword):
         message = f"cannot see --{element}-- on page with keyword --{keyword}--"
         self.log.info(f"Wait the element [{element}] which match [{keyword}] to display")
