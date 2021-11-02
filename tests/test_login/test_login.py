@@ -1,4 +1,6 @@
 def test_cui_login(web):
+    """BVT-1: test login"""
+    web.log.info("user login")
     web.static("Login ID | Login name").input("ANE54527")
     web.text_field("Password").input("123456")
     web.button("Login | Sign in").click()
