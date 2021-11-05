@@ -15,8 +15,10 @@ def pytest_runtest_makereport(item):
     rep = outcome.get_result()
     rep.description = str(item.function.__doc__)
     setattr(item, "rep_" + rep.when, rep)
+    logger = logging.getLogger("System")
     if rep.when == "call":
         if rep.failed:
+            logger.info(f"\x1b[0;31mScript [{item.function.__name__}] result is: Failed.\x1b[0m")
             driver = getattr(pytest, "web_test")._driver
             screenshot_file_path = Path.cwd().joinpath("results", "screenshots", "%s.png" % datetime.datetime.now().strftime("%Y%m%d%H%M%S%f"))
             driver.save_screenshot(str(screenshot_file_path))
@@ -25,12 +27,18 @@ def pytest_runtest_makereport(item):
             extra = getattr(rep, 'extra', [])
             extra.append(item.config.pluginmanager.getplugin('html').extras.html(extra_html))
             rep.extra = extra
+        elif rep.passed:
+            logger.info(f"\x1b[0;32mScript [{item.function.__name__}] result is: Pass.\x1b[0m")
+        elif rep.skipped:
+            logger.info(f"\x1b[0;33mScript [{item.function.__name__}] result is: Skipped.\x1b[0m")
+
 
 
 def pytest_configure(config):
-    print("loading model...")
+    logger = logging.getLogger("System")
+    logger.info("loading model...")
     setattr(pytest, "model", init_model())
-    print("model loaded...")
+    logger.info("model loaded...")
     command_data = getattr(pytest, "command_data")
     if hasattr(config, '_metadata'):
         for item in ["Packages", "Plugins", "JAVA_HOME"]:
@@ -86,7 +94,6 @@ def pytest_html_results_table_header(cells):
 def pytest_html_results_table_row(report, cells):
     try:
         cells.insert(2, html.td(report.description))
-        # cells.insert(2, html.td("to be updated"))
         cells.insert(3, html.td(datetime.datetime.now(), class_='col-time'))
         cells.pop()
     except Exception as e:
