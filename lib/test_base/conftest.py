@@ -1,9 +1,30 @@
 import pytest
 import logging
 import os
+import datetime
 from models.pred import *
 from utils.selenium_utils import SeleniumUtils
 from lib.action.web import WebAction
+from py.xml import html
+from pathlib import Path
+
+
+@pytest.hookimpl(hookwrapper=True)
+def pytest_runtest_makereport(item):
+    outcome = yield
+    rep = outcome.get_result()
+    rep.description = str(item.function.__doc__)
+    setattr(item, "rep_" + rep.when, rep)
+    if rep.when == "call":
+        if rep.failed:
+            driver = getattr(pytest, "web_test")._driver
+            screenshot_file_path = Path.cwd().joinpath("results", "screenshots", "%s.png" % datetime.datetime.now().strftime("%Y%m%d%H%M%S%f"))
+            driver.save_screenshot(str(screenshot_file_path))
+            extra_html = '<div><img src="%s" alt="screenshot" style="width:304px;height:228px;" ' \
+                   'onclick="window.open(this.src)" align="right"/></div>' % screenshot_file_path
+            extra = getattr(rep, 'extra', [])
+            extra.append(item.config.pluginmanager.getplugin('html').extras.html(extra_html))
+            rep.extra = extra
 
 
 def pytest_configure(config):
@@ -51,3 +72,22 @@ def web(logger):
 def logger():
     current_log = logging.getLogger(os.environ.get('PYTEST_CURRENT_TEST').split('::')[-2].split(' ')[0])
     return current_log
+
+
+def pytest_html_results_table_header(cells):
+    try:
+        cells.insert(2, html.th('Description'))
+        cells.insert(3, html.th('Time', class_='sortable time', col='time'))
+        cells.pop()
+    except Exception as e:
+        print("error occur in header, cannot update report: %s" % str(e))
+
+
+def pytest_html_results_table_row(report, cells):
+    try:
+        cells.insert(2, html.td(report.description))
+        # cells.insert(2, html.td("to be updated"))
+        cells.insert(3, html.td(datetime.datetime.now(), class_='col-time'))
+        cells.pop()
+    except Exception as e:
+        print("error occur in row, cannot update report: %s" % str(e))
