@@ -4,6 +4,7 @@ import os
 import datetime
 from models.pred import *
 from utils.selenium_utils import SeleniumUtils
+from utils.yaml_helper import YamlHelper
 from lib.action.web import WebAction
 from py.xml import html
 from pathlib import Path
@@ -31,7 +32,6 @@ def pytest_runtest_makereport(item):
             logger.info(f"\x1b[0;32mScript [{item.function.__name__}] result is: Pass.\x1b[0m")
         elif rep.skipped:
             logger.info(f"\x1b[0;33mScript [{item.function.__name__}] result is: Skipped.\x1b[0m")
-
 
 
 def pytest_configure(config):
@@ -63,14 +63,22 @@ def web(logger):
     logger.info("Start web test.......")
     web_test = type('web_test', (), {})()
     command_data = getattr(pytest, "command_data")
-    url = ""
+    url_file = Path.cwd().joinpath("data", "url.yaml")
+    home_page = None
+    if Path.exists(url_file):
+        url_data = YamlHelper.load_yaml(url_file)
+        try:
+            home_page = url_data["web"]["home_page"][command_data["environment"]]
+        except (KeyError, AttributeError):
+            pass
     driver = SeleniumUtils.get_driver(command_data["browser"])
     action = WebAction(driver, getattr(pytest, "model"))
     setattr(web_test, "_driver", driver)
     setattr(web_test, "action", action)
     setattr(web_test, "log", logger)
     setattr(pytest, "web_test", web_test)
-    action.browse_page(url)
+    if home_page:
+        action.browse_page(home_page)
     yield web_test
     logger.info("Exit web test.......")
     SeleniumUtils.quit_driver()
