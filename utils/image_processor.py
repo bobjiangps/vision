@@ -5,11 +5,15 @@ import pytesseract as ptr
 class ImageProcessor:
 
     @classmethod
-    def recognize_contours(cls, img):
+    def recognize_contours(cls, img, font="small"):
+        rk_size = {
+            "small": (18, 18),
+            "large": (36, 36)
+        }
         img = cv2.imread(img)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         ret, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
-        rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (18, 18))
+        rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, rk_size[font.lower()])
         dilation = cv2.dilate(thresh, rect_kernel, iterations=1)
         contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
         img_copy = img.copy()

@@ -33,10 +33,25 @@ class TextDisplayOnPage(BaseExpectation):
     def __call__(self, driver):
         driver.save_screenshot(self._img)
         contours, shape = IP.recognize_contours(self._img)
-        for c in contours:
-            for t in self.text.split("|"):
+        for t in self.text.split("|"):
+            for c in contours:
                 if c[1].find(t.strip()) >= 0:
                     return proportion(center(c[0]), self.get_viewport_size(driver), shape)
+        words = []
+        double_check = False
+        for t in self.text.split("|"):
+            if t.find(" ") > 0:
+                words.append(t.split(" ")[0])
+        for w in words:
+            if str(contours).find(f"'{w}'") > 0:
+                double_check = True
+                break
+        if double_check:
+            contours, shape = IP.recognize_contours(self._img, font="large")
+            for t in self.text.split("|"):
+                for c in contours:
+                    if c[1].find(t.strip()) >= 0:
+                        return proportion(center(c[0]), self.get_viewport_size(driver), shape)
         # raise NotVisibleException("text NOT visible")
         return False
 
