@@ -1,6 +1,7 @@
 from lib.support.custom_wait import CustomWait
 from lib.support.expected import *
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.common.exceptions import MoveTargetOutOfBoundsException
 from utils.selenium_utils import SeleniumUtils
 from lib.elements.button import Button
@@ -18,6 +19,7 @@ class WebAction(CustomWait):
         self._driver = driver
         self._model = model
         self.action_chains = ActionChains(self._driver)
+        self.action_builder = ActionBuilder(self._driver)
         self.log = Logger.get_logger(os.environ.get('PYTEST_CURRENT_TEST').split('::')[-2].split(' ')[0])
 
     def wait_until_text_display(self, text):
@@ -49,15 +51,16 @@ class WebAction(CustomWait):
 
     def click(self, element):
         self.log.info("Perform click on the element")
-        body = self._driver.find_element_by_tag_name("body")
-        self.action_chains.move_to_element_with_offset(body, element[0], element[1]).click().perform()
-        self.action_chains.reset_actions()
+        self.action_builder.pointer_action.move_to_location(element[0], element[1])
+        self.action_builder.pointer_action.click()
+        self.action_builder.perform()
 
     def input(self, element, value):
         self.log.info(f"Input [{value}] to the element")
-        body = self._driver.find_element_by_tag_name("body")
-        self.action_chains.move_to_element_with_offset(body, element[0], element[1]).click().send_keys(value).perform()
-        self.action_chains.reset_actions()
+        self.action_builder.pointer_action.move_to_location(element[0], element[1])
+        self.action_builder.pointer_action.click()
+        self.action_builder.perform()
+        self.action_chains.send_keys(value).perform()
 
     def browse_page(self, url):
         self.log.info(f"Browser page {url}")
