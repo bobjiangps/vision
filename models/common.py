@@ -1,13 +1,7 @@
 import torch
 import torch.nn as nn
 import math
-from utils.general import non_max_suppression
-
-
-def autopad(k, p=None):
-    if p is None:
-        p = k // 2 if isinstance(k, int) else [x // 2 for x in k]
-    return p
+from lib.visual.common import non_max_suppression
 
 
 class Conv(nn.Module):
@@ -22,10 +16,6 @@ class Conv(nn.Module):
 
     def fuseforward(self, x):
         return self.act(self.conv(x))
-
-
-def DWConv(c1, c2, k=1, s=1, act=True):
-    return Conv(c1, c2, k, s, g=math.gcd(c1, c2), act=act)
 
 
 class Bottleneck(nn.Module):
@@ -195,3 +185,13 @@ class C3TR(C3):
         super().__init__(c1, c2, n, shortcut, g, e)
         c_ = int(c2 * e)
         self.m = TransformerBlock(c_, c_, 4, n)
+
+
+def autopad(k, p=None):
+    if p is None:
+        p = k // 2 if isinstance(k, int) else [x // 2 for x in k]
+    return p
+
+
+def DWConv(c1, c2, k=1, s=1, act=True):
+    return Conv(c1, c2, k, s, g=math.gcd(c1, c2), act=act)

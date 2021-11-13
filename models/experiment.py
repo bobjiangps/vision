@@ -14,7 +14,7 @@ class Ensemble(nn.ModuleList):
         return y, None
 
 
-def attempt_load(weights, map_location=None):
+def load(weights, map_location=None):
     model = Ensemble()
     ckpt = torch.load(weights, map_location=map_location)
     model.append(ckpt['ema' if ckpt.get('ema') else 'model'].float().fuse().eval())

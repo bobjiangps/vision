@@ -3,7 +3,7 @@ import os
 import cv2
 import numpy as np
 from pathlib import Path
-from utils.augmentations import letterbox
+from lib.visual.augment import letterbox
 
 img_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'dng', 'webp', 'mpo']
 vid_formats = ['mov', 'avi', 'mp4', 'mpg', 'mpeg', 'm4v', 'wmv', 'mkv']

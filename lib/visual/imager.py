@@ -2,7 +2,7 @@ import cv2
 import pytesseract as ptr
 
 
-class ImageProcessor:
+class Imager:
 
     @classmethod
     def recognize_contours(cls, img, font="small"):

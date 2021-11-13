@@ -1,15 +1,15 @@
 import torch
-from models.experimental import attempt_load
-from utils.datasets import LoadImages
-from utils.general import check_img_size, non_max_suppression, scale_coords
-from utils.torch_utils import time_synchronized
+from models.experiment import load
+from lib.visual.datasets import LoadImages
+from lib.visual.common import check_img_size, non_max_suppression, scale_coords
+from lib.visual.torch_assistant import time_synchronized
 from conf.config import LoadConfig
 from pathlib import Path
 
 
 def init_model(device=torch.device("cpu")):
     config = LoadConfig().model
-    model = attempt_load(Path.cwd().joinpath("resource", "models", f"{config['weights']}.pt"), map_location=device)
+    model = load(Path.cwd().joinpath("resource", "models", f"{config['weights']}.pt"), map_location=device)
     return model
 
 

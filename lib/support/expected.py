@@ -1,9 +1,9 @@
-from utils.image_processor import ImageProcessor as IP
+from lib.visual.imager import Imager
+from lib.visual.common import center, proportion, distance_by_direction
 from lib.support.exceptions import NotVisibleException
 from models.pred import predict
 from pathlib import Path
 from conf.config import LoadConfig
-from utils.general import center, proportion, distance_by_direction
 
 
 class BaseExpectation:
@@ -32,7 +32,7 @@ class TextDisplayOnPage(BaseExpectation):
 
     def __call__(self, driver):
         driver.save_screenshot(self._img)
-        contours, shape = IP.recognize_contours(self._img)
+        contours, shape = Imager.recognize_contours(self._img)
         for t in self.text.split("|"):
             for c in contours:
                 if c[1].find(t.strip()) >= 0:
@@ -47,7 +47,7 @@ class TextDisplayOnPage(BaseExpectation):
                 double_check = True
                 break
         if double_check:
-            contours, shape = IP.recognize_contours(self._img, font="large")
+            contours, shape = Imager.recognize_contours(self._img, font="large")
             for t in self.text.split("|"):
                 for c in contours:
                     if c[1].find(t.strip()) >= 0:
@@ -73,7 +73,7 @@ class ElementDisplayOnPage(BaseExpectation):
             if r["N"] == self.element:
                 if self.keyword:
                     for k in self.keyword.split("|"):
-                        if IP.recognize_crop_contours(self._img, r["COOR"]).find(k.strip()) >= 0:
+                        if Imager.recognize_crop_contours(self._img, r["COOR"]).find(k.strip()) >= 0:
                             return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
                 else:
                     return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
@@ -93,7 +93,7 @@ class ElementMatchOnPage(BaseExpectation):
     def __call__(self, driver):
         driver.save_screenshot(self._img)
         match_keyword = None
-        contours, shape = IP.recognize_contours(self._img)
+        contours, shape = Imager.recognize_contours(self._img)
         for c in contours:
             for t in self.keyword.split("|"):
                 if c[1].find(t.strip()) >= 0:

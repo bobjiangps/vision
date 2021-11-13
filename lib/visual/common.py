@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import torch
 import torchvision
-from utils.metrics import box_iou
+from lib.visual.metrics import box_iou
 
 torch.set_printoptions(linewidth=320, precision=5, profile='long')
 np.set_printoptions(linewidth=320, formatter={'float_kind': '{:11.5g}'.format})

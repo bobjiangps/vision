@@ -1,10 +1,10 @@
 from copy import deepcopy
 from pathlib import Path
 from models.common import *
-from models.experimental import *
-from utils.torch_utils import time_synchronized, fuse_conv_and_bn, model_info, scale_img, initialize_weights, copy_attr
-from utils.general import make_divisible
-from utils.plots import feature_visualization
+from models.experiment import *
+from lib.visual.torch_assistant import time_synchronized, fuse_conv_and_bn, model_info, scale_img, initialize_weights, copy_attr
+from lib.visual.common import make_divisible
+from lib.visual.plots import feature_visualization
 try:
     import thop
 except ImportError:
