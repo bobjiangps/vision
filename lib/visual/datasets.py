@@ -5,9 +5,6 @@ import numpy as np
 from pathlib import Path
 from lib.visual.augment import letterbox
 
-img_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'dng', 'webp', 'mpo']
-# vid_formats = ['mov', 'avi', 'mp4', 'mpg', 'mpeg', 'm4v', 'wmv', 'mkv']
-
 
 class LoadImages:
     def __init__(self, path, img_size=640, stride=32):
@@ -20,7 +17,8 @@ class LoadImages:
             files = [p]
         else:
             raise Exception(f'ERROR: {p} does not exist')
-
+        img_formats = ['bmp', 'jpg', 'jpeg', 'png', 'tif', 'tiff', 'dng', 'webp', 'mpo']
+        # vid_formats = ['mov', 'avi', 'mp4', 'mpg', 'mpeg', 'm4v', 'wmv', 'mkv']
         images = [x for x in files if x.split('.')[-1].lower() in img_formats]
         # videos = [x for x in files if x.split('.')[-1].lower() in vid_formats]
         # ni, nv = len(images), len(videos)
@@ -79,7 +77,8 @@ class LoadImages:
         img = img.transpose((2, 0, 1))[::-1]
         img = np.ascontiguousarray(img)
 
-        return path, img, img0, self.cap
+        # return path, img, img0, self.cap
+        return path, img, img0
 
     # def new_video(self, path):
     #     self.frame = 0

@@ -22,7 +22,7 @@ def predict(model, device=torch.device("cpu")):
     label_store = {}
     results = []
     shape = None
-    for path, img, im0s, vid_cap in dataset:
+    for path, img, im0s in dataset:
         img = torch.from_numpy(img).to(device)
         img = img.float()
         img /= 255.0
