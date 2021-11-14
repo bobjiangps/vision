@@ -1,7 +1,7 @@
 from lib.visual.imager import Imager
 from lib.visual.common import center, proportion, distance_by_direction
 from lib.support.exceptions import NotVisibleException
-from models.pred import predict
+from lib.visual.pred import predict
 from pathlib import Path
 from conf.config import LoadConfig
 

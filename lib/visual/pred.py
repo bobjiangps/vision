@@ -1,5 +1,5 @@
 import torch
-from models.experiment import load
+from lib.visual.experiment import load
 from lib.visual.datasets import LoadImages
 from lib.visual.common import check_img_size, non_max_suppression, scale_coords
 from lib.visual.torch_assistant import time_synchronized

@@ -1,7 +1,7 @@
 from copy import deepcopy
 from pathlib import Path
 from models.common import *
-from models.experiment import *
+from lib.visual.experiment import *
 from lib.visual.torch_assistant import time_synchronized, fuse_conv_and_bn, model_info, scale_img, initialize_weights, copy_attr
 from lib.visual.common import make_divisible
 from lib.visual.plots import feature_visualization

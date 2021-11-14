@@ -2,7 +2,7 @@ import pytest
 import logging
 import os
 import datetime
-from models.pred import *
+from lib.visual.pred import *
 from utils.selenium_utils import SeleniumUtils
 from utils.yaml_helper import YamlHelper
 from lib.action.web import WebAction
