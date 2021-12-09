@@ -7,6 +7,10 @@ from utils.selenium_utils import SeleniumUtils
 from lib.elements.button import Button
 from lib.elements.static import Static
 from lib.elements.text_field import TextField
+from lib.non_ai_elements.button import NonAiButton
+from lib.non_ai_elements.static import NonAiStatic
+from lib.non_ai_elements.text_field import NonAiTextField
+from lib.non_ai_elements.link import NonAiLink
 from utils.logger import Logger
 import os
 import pytest
@@ -67,12 +71,13 @@ class WebAction(CustomWait):
         self._driver.get(url)
         offset, _ = self.check_offset()
         web_test = getattr(pytest, "web_test")
-        button = Button(self, offset)
-        static = Static(self, offset)
-        text_field = TextField(self, offset)
-        setattr(web_test, "button", button)
-        setattr(web_test, "static", static)
-        setattr(web_test, "text_field", text_field)
+        setattr(web_test, "button", Button(self, offset))
+        setattr(web_test, "static", Static(self, offset))
+        setattr(web_test, "text_field", TextField(self, offset))
+        setattr(web_test, "non_ai_button", NonAiButton(self))
+        setattr(web_test, "non_ai_static", NonAiStatic(self))
+        setattr(web_test, "non_ai_text_field", NonAiTextField(self))
+        setattr(web_test, "non_ai_link", NonAiLink(self))
         setattr(pytest, "web_test", web_test)
 
     def restart_browser(self, url=None):
