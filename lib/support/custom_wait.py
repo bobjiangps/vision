@@ -2,9 +2,10 @@ import time
 import traceback
 from lib.support.exceptions import NotVisibleException
 from lib.support.exceptions import TimeoutException
+from selenium.common.exceptions import NoSuchElementException
 
 
-IGNORED_EXCEPTIONS = (NotVisibleException,)
+IGNORED_EXCEPTIONS = (NotVisibleException, NoSuchElementException)
 
 
 class CustomWait:
