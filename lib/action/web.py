@@ -1,5 +1,6 @@
 from lib.support.custom_wait import CustomWait
 from lib.support.expected import *
+from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.common.exceptions import MoveTargetOutOfBoundsException
@@ -104,3 +105,42 @@ class WebAction(CustomWait):
                 except MoveTargetOutOfBoundsException:
                     y += 10
         return [x, y], body
+
+    def find_non_ai_element(self, by, value):
+        return self._driver.find_element(by, value)
+
+    def find_non_ai_elements(self, by, value):
+        return self._driver.find_elements(by, value)
+
+    def wait_until_non_ai_element_present(self, by, value):
+        self.log.info("Wait the element present by {0}: '{1}'".format(by, value))
+        message = "Unable to check the element present by {0}: '{1}'".format(by, value)
+        return self.until(ec.presence_of_element_located((by, value)), message)
+
+    def wait_until_non_ai_element_display(self, by, value):
+        self.log.info("Wait the element display by {0}: '{1}'".format(by, value))
+        message = "Unable to check the element display by {0}: '{1}'".format(by, value)
+        return self.until(ec.visibility_of_element_located((by, value)), message)
+
+    def wait_until_non_ai_element_disappear(self, by, value):
+        self.log.info("Wait the element disappear by {0}: '{1}'".format(by, value))
+        message = "Unable to check the element disappear by {0}: '{1}'".format(by, value)
+        return self.until_not(ec.presence_of_element_located((by, value)), message)
+
+    def wait_until_non_ai_element_clickable(self, by, value):
+        self.log.info("Wait the element clickable by {0}: '{1}'".format(by, value))
+        message = "Unable to check the element clickable by {0}: '{1}'".format(by, value)
+        return self.until(ec.element_to_be_clickable((by, value)), message)
+
+    def wait_until_non_ai_element_selected(self, by, value):
+        self.log.info("Wait the element selected by {0}: '{1}'".format(by, value))
+        message = "Unable to check the element selected by {0}: '{1}'".format(by, value)
+        return self.until(ec.element_located_to_be_selected((by, value)), message)
+
+    def click_non_ai_element(self, element):
+        self.log.info("Perform click on the element")
+        element.click()
+
+    def input_non_ai_element(self, element, value):
+        self.log.info(f"Input [{value}] to the element")
+        element.send_keys(value)
