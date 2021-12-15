@@ -12,20 +12,18 @@ from lib.non_ai_elements.button import NonAiButton
 from lib.non_ai_elements.static import NonAiStatic
 from lib.non_ai_elements.text_field import NonAiTextField
 from lib.non_ai_elements.link import NonAiLink
-from utils.logger import Logger
-import os
 import pytest
 
 
 class WebAction(CustomWait):
 
-    def __init__(self, driver, model, timeout=30):
+    def __init__(self, driver, model, logger, timeout=30):
         super().__init__(timeout)
         self._driver = driver
         self._model = model
         self.action_chains = ActionChains(self._driver)
         self.action_builder = ActionBuilder(self._driver)
-        self.log = Logger.get_logger(os.environ.get('PYTEST_CURRENT_TEST').split('::')[-2].split(' ')[0])
+        self.log = logger
 
     def wait_until_text_display(self, text):
         self.log.info(f"Wait the text [{text}] to display")

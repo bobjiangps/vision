@@ -72,7 +72,7 @@ def web(logger):
         except (KeyError, AttributeError):
             pass
     driver = SeleniumUtils.get_driver(command_data["browser"])
-    action = WebAction(driver, getattr(pytest, "model"))
+    action = WebAction(driver, getattr(pytest, "model"), logger)
     setattr(web_test, "_driver", driver)
     setattr(web_test, "action", action)
     setattr(web_test, "log", logger)
