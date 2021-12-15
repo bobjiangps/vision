@@ -24,12 +24,12 @@ if __name__ == "__main__":
                                           % (command_data["environment"], datetime.datetime.now().strftime("%Y%m%d%H%M%S"), report_suffix))
         command_list = ["--html", str(report_path)]
         if command_data["test"]:
-            for in_test in command_data["test"].split(","):
+            for in_test in command_data["test"]:
                 command_list.append(str(Path.cwd().joinpath("tests", in_test.strip())))
         elif not command_data["test"]:
             command_list.append(str(Path.cwd().joinpath("tests")))
         elif command_data["exclude_test"]:
-            for ex_test in command_data["exclude_test"].split(","):
+            for ex_test in command_data["exclude_test"]:
                 command_list.extend(("--deselect", str(Path.cwd().joinpath("tests", ex_test.strip()))))
         if command_data["keyword"]:
             command_list.extend(("-k", command_data["keyword"].strip()))

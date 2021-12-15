@@ -560,3 +560,4 @@ Optimizer stripped from runs/train/activeyolo5s_results10/weights/best.pt, 14.8M
 
 python main.py -k test_login -b Chrome -e QA
 python main.py -k test_non_ai_login -b Chrome -e PROD
+python main.py -t test_login test_non_ai_login -b Chrome -e PROD
