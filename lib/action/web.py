@@ -104,6 +104,9 @@ class WebAction(CustomWait):
                     y += 10
         return [x, y], body
 
+    def find_non_ai_element_by_coordinates(self, x, y):
+        return self._driver.execute_script(f"return document.elementFromPoint({x}, {y});")
+
     def find_non_ai_element(self, by, value):
         return self._driver.find_element(by, value)
 
