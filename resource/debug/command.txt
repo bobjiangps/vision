@@ -1,1 +1,2 @@
 python main.py -e QA -t test_login -b Chrome
+python main.py -e PROD -t test_non_ai_login -b Chrome

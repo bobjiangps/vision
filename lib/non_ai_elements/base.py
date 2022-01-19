@@ -1,9 +1,9 @@
 class NonAiElementBase:
 
-    def __init__(self, action):
+    def __init__(self, action, identify_type=None, identify_value=None):
         self._action = action
-        self.identify_type = None
-        self.identify_value = None
+        self.identify_type = identify_type
+        self.identify_value = identify_value
 
     def element(self):
         return self._action.find_non_ai_element(self.identify_type, self.identify_value)
@@ -31,3 +31,8 @@ class NonAiElementBase:
 
     def action_input(self, element, value):
         self._action.input_non_ai_element(element, value)
+
+    def _produce(self):
+        # self.__class__(self._action, self.identify_type, self.identify_value)
+        # or
+        return type(self)(self._action, self.identify_type, self.identify_value)

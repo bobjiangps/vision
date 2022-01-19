@@ -6,7 +6,7 @@ class NonAiStatic(NonAiElementBase):
     def __call__(self, identify_type, identify_value):
         self.identify_type = identify_type
         self.identify_value = identify_value
-        return self
+        return self._produce()
 
     def click(self):
         static = self.wait_element_visible()
