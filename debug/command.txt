@@ -1,0 +1,1 @@
+python main.py -e QA -t test_login -b Chrome
