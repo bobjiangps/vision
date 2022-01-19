@@ -1,11 +1,11 @@
 class ElementBase:
 
-    def __init__(self, action, offset):
+    def __init__(self, action, offset, text=None, element_type=None, keyword=None):
         self._action = action
         self._offset = offset
-        self.text = None
-        self.element_type = None
-        self.keyword = None
+        self.text = text
+        self.element_type = element_type
+        self.keyword = keyword
 
     def wait_text_visible(self):
         return self._action.wait_until_text_display(self.text)
@@ -24,3 +24,8 @@ class ElementBase:
 
     def action_input(self, element, value):
         self._action.input((element[0], element[1] + self._offset[1]), value)
+
+    def _produce(self):
+        # self.__class__(self._action, self._offset, self.text, self.element_type, self.keyword)
+        # or
+        return type(self)(self._action, self._offset, self.text, self.element_type, self.keyword)

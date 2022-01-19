@@ -6,7 +6,7 @@ class Static(ElementBase):
     def __call__(self, text):
         self.text = text
         self.element_type = self.__class__.__qualname__
-        return self
+        return self._produce()
 
     def click(self):
         element = self.wait_text_visible()
