@@ -1,5 +1,6 @@
 from lib.support.custom_wait import CustomWait
 from lib.support.expected import *
+from conf.default import *
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
@@ -17,53 +18,75 @@ import pytest
 
 class WebAction(CustomWait):
 
-    def __init__(self, driver, model, logger, timeout=30):
-        super().__init__(timeout)
+    def __init__(self, driver, model, logger, timeout=default_timeout):
+        super().__init__(driver, timeout)
         self._driver = driver
         self._model = model
         self.action_chains = ActionChains(self._driver)
         self.action_builder = ActionBuilder(self._driver)
         self.log = logger
+        self.timeout = timeout
 
-    def wait_until_text_display(self, text):
+    def wait_until_text_display(self, text, timeout=default_timeout):
         self.log.info(f"Wait the text [{text}] to display")
-        return self.until(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
+        return self.until(TextDisplayOnPage(text), f"cannot see --{text}-- on page") \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
 
-    def wait_until_element_display(self, element, keyword=None):
+    def wait_until_element_display(self, element, keyword=None, timeout=default_timeout):
         message = f"cannot see --{element}-- on page"
         if keyword:
             message += f" with keyword --{keyword}--"
             self.log.info(f"Wait the element [{element}] identified by [{keyword}] to display")
         else:
             self.log.info(f"Wait the element [{element}] to display")
-        return self.until(ElementDisplayOnPage(self._model, element, keyword), message)
+        return self.until(ElementDisplayOnPage(self._model, element, keyword), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until(ElementDisplayOnPage(self._model, element, keyword), message)
 
-    def wait_until_element_disappear(self, element, keyword=None):
+    def wait_until_element_disappear(self, element, keyword=None, timeout=default_timeout):
         message = f"The element --{element}-- still display on page"
         if keyword:
             message += f" with keyword --{keyword}--"
             self.log.info(f"Wait the element [{element}] identified by [{keyword}] to disappear")
         else:
             self.log.info(f"Wait the element [{element}] to disappear")
-        return self.until_not(ElementDisplayOnPage(self._model, element, keyword), message)
+        return self.until_not(ElementDisplayOnPage(self._model, element, keyword), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until_not(ElementDisplayOnPage(self._model, element, keyword), message)
 
-    def wait_until_element_match(self, element, keyword):
+    def wait_until_element_match(self, element, keyword, timeout=default_timeout):
         message = f"cannot see --{element}-- on page with keyword --{keyword}--"
         self.log.info(f"Wait the element [{element}] which match [{keyword}] to display")
-        return self.until(ElementMatchOnPage(self._model, element, keyword), message)
+        return self.until(ElementMatchOnPage(self._model, element, keyword), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until(ElementMatchOnPage(self._model, element, keyword), message)
 
     def click(self, element):
         self.log.info("Perform click on the element")
         self.action_builder.pointer_action.move_to_location(element[0], element[1])
         self.action_builder.pointer_action.click()
         self.action_builder.perform()
+        self.clear_actions(self.action_builder)
 
     def input(self, element, value):
         self.log.info(f"Input [{value}] to the element")
         self.action_builder.pointer_action.move_to_location(element[0], element[1])
         self.action_builder.pointer_action.click()
         self.action_builder.perform()
+        self.clear_actions(self.action_builder)
         self.action_chains.send_keys(value).perform()
+        self.clear_actions(self.action_chains)
+
+    @staticmethod
+    # for selenium 3, cannot reset actions
+    def clear_actions(item):
+        if hasattr(item, "w3c_actions"):
+            for device in item.w3c_actions.devices:
+                device.clear_actions()
+        else:
+            for device in item.devices:
+                device.clear_actions()
 
     def browse_page(self, url):
         self.log.info(f"Browser page {url}")
@@ -113,30 +136,40 @@ class WebAction(CustomWait):
     def find_non_ai_elements(self, by, value):
         return self._driver.find_elements(by, value)
 
-    def wait_until_non_ai_element_present(self, by, value):
+    def wait_until_non_ai_element_present(self, by, value, timeout=default_timeout):
         self.log.info("Wait the element present by {0}: '{1}'".format(by, value))
         message = "Unable to check the element present by {0}: '{1}'".format(by, value)
-        return self.until(ec.presence_of_element_located((by, value)), message)
+        return self.until(ec.presence_of_element_located((by, value)), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until(ec.presence_of_element_located((by, value)), message)
 
-    def wait_until_non_ai_element_display(self, by, value):
+    def wait_until_non_ai_element_display(self, by, value, timeout=default_timeout):
         self.log.info("Wait the element display by {0}: '{1}'".format(by, value))
         message = "Unable to check the element display by {0}: '{1}'".format(by, value)
-        return self.until(ec.visibility_of_element_located((by, value)), message)
+        return self.until(ec.visibility_of_element_located((by, value)), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until(ec.visibility_of_element_located((by, value)), message)
 
-    def wait_until_non_ai_element_disappear(self, by, value):
+    def wait_until_non_ai_element_disappear(self, by, value, timeout=default_timeout):
         self.log.info("Wait the element disappear by {0}: '{1}'".format(by, value))
         message = "Unable to check the element disappear by {0}: '{1}'".format(by, value)
-        return self.until_not(ec.presence_of_element_located((by, value)), message)
+        return self.until_not(ec.presence_of_element_located((by, value)), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until_not(ec.presence_of_element_located((by, value)), message)
 
-    def wait_until_non_ai_element_clickable(self, by, value):
+    def wait_until_non_ai_element_clickable(self, by, value, timeout=default_timeout):
         self.log.info("Wait the element clickable by {0}: '{1}'".format(by, value))
         message = "Unable to check the element clickable by {0}: '{1}'".format(by, value)
-        return self.until(ec.element_to_be_clickable((by, value)), message)
+        return self.until(ec.element_to_be_clickable((by, value)), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until(ec.element_to_be_clickable((by, value)), message)
 
-    def wait_until_non_ai_element_selected(self, by, value):
+    def wait_until_non_ai_element_selected(self, by, value, timeout=default_timeout):
         self.log.info("Wait the element selected by {0}: '{1}'".format(by, value))
         message = "Unable to check the element selected by {0}: '{1}'".format(by, value)
-        return self.until(ec.element_located_to_be_selected((by, value)), message)
+        return self.until(ec.element_located_to_be_selected((by, value)), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until(ec.element_located_to_be_selected((by, value)), message)
 
     def click_non_ai_element(self, element):
         self.log.info("Perform click on the element")

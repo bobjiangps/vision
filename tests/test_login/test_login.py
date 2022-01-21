@@ -7,8 +7,8 @@ def test_cui_login_successful(web):
     web.static("Login ID | Login name").input("ANE54527")
     web.text_field("Password").input("123456")
     web.button("Login | Sign in").click()
-    web.button("Login | Sign in").wait_element_disappear()
-    web.static("Account Options").wait_text_visible()
+    web.button("Login | Sign in").wait_element_disappear(5)
+    web.static("Account Options").wait_text_visible(10)
     # # validate the restart attribute below
     # web.action.restart_browser()
     # web.action.browse_page("https://www.stackoverflow.com")
