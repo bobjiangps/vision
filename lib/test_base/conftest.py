@@ -19,7 +19,8 @@ def pytest_runtest_makereport(item):
     logger = logging.getLogger("System")
     if rep.when == "call":
         if rep.failed:
-            logger.info(f"\x1b[0;31mScript [{item.function.__name__}] result is: Failed.\x1b[0m")
+            logger.error(f"\x1b[0;31mScript [{item.function.__name__}] result is: Failed.\x1b[0m")
+            logger.error(f"\x1b[0;31mFailure Details: {rep.longreprtext}\x1b[0m")
             driver = getattr(pytest, "web_test")._driver
             screenshot_file_path = Path.cwd().joinpath("results", "screenshots", "%s.png" % datetime.datetime.now().strftime("%Y%m%d%H%M%S%f"))
             driver.save_screenshot(str(screenshot_file_path))
