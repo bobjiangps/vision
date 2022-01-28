@@ -6,13 +6,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.common.exceptions import MoveTargetOutOfBoundsException
 from utils.selenium_utils import SeleniumUtils
-from lib.elements.button import Button
-from lib.elements.static import Static
-from lib.elements.text_field import TextField
-from lib.non_ai_elements.button import NonAiButton
-from lib.non_ai_elements.static import NonAiStatic
-from lib.non_ai_elements.text_field import NonAiTextField
-from lib.non_ai_elements.link import NonAiLink
+from lib.elements import *
+from lib.non_ai_elements import *
 import pytest
 
 
@@ -91,11 +86,10 @@ class WebAction(CustomWait):
     def browse_page(self, url):
         self.log.info(f"Browser page {url}")
         self._driver.get(url)
-        offset, _ = self.check_offset()
         web_test = getattr(pytest, "web_test")
-        setattr(web_test, "button", Button(self, offset))
-        setattr(web_test, "static", Static(self, offset))
-        setattr(web_test, "text_field", TextField(self, offset))
+        setattr(web_test, "button", Button(self))
+        setattr(web_test, "static", Static(self))
+        setattr(web_test, "text_field", TextField(self))
         setattr(web_test, "non_ai_button", NonAiButton(self))
         setattr(web_test, "non_ai_static", NonAiStatic(self))
         setattr(web_test, "non_ai_text_field", NonAiTextField(self))

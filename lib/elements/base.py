@@ -3,9 +3,9 @@ from conf.default import *
 
 class ElementBase:
 
-    def __init__(self, action, offset, text=None, element_type=None, keyword=None):
+    def __init__(self, action, offset=None, text=None, element_type=None, keyword=None):
         self._action = action
-        self._offset = offset
+        self._offset = [0, 0] if not offset else offset
         self.text = text
         self.element_type = element_type
         self.keyword = keyword
