@@ -1,15 +1,14 @@
-from lib.test_base.page_base import PageBase
+from lib.test_base.page_base import *
 
 
 class NonAILoginPage(PageBase):
 
-    def __init__(self, platform):
-        super().__init__(platform)
-        self.login_link = platform.non_ai_link("xpath", "//a[contains(@href, 'login')]")
-        self.username_field = platform.non_ai_text_field("id", "username")
-        self.password_field = platform.non_ai_text_field("id", "password")
-        self.login_btn = platform.non_ai_button("xpath", "//input[@id='password']/following-sibling::button[@type='submit']")
-        self.error_message = platform.non_ai_static("xpath", "//p[@style='color:red']")
+    def __init__(self):
+        self.login_link = NonAiLink("xpath", "//a[contains(@href, 'login')]")
+        self.username_field = NonAiTextField("id", "username")
+        self.password_field = NonAiTextField("id", "password")
+        self.login_btn = NonAiButton("xpath", "//input[@id='password']/following-sibling::button[@type='submit']")
+        self.error_message = NonAiStatic("xpath", "//p[@style='color:red']")
 
     def fill_account(self, account):
         self.login_link.click()
@@ -25,6 +24,6 @@ class NonAILoginPage(PageBase):
         return self
 
     def login_failed_then_fetch_error_message(self, account, pw):
-        self.platform.log.info("start to login")
+        self.log.info("start to login")
         self.fill_account(account).fill_password(pw).click_login()
         return self.error_message.wait_element_visible().text

@@ -3,17 +3,22 @@ from conf.default import *
 
 class ElementBase:
 
-    def __init__(self, action, offset=None, text=None, element_type=None, keyword=None):
-        self._action = action
+    _action = None
+
+    def __init__(self, offset=None, text=None, element_type=None, keyword=None):
         self._offset = [0, 0] if not offset else offset
         self.text = text
         self.element_type = element_type
         self.keyword = keyword
 
+    @classmethod
+    def set_action(cls, value):
+        cls._action = value
+
     def _produce(self):
         # self.__class__(self._action, self._offset, self.text, self.element_type, self.keyword)
         # or
-        return type(self)(self._action, self._offset, self.text, self.element_type, self.keyword)
+        return type(self)(self._offset, self.text, self.element_type, self.keyword)
 
     def wait_text_visible(self, timeout=default_timeout):
         return self._action.wait_until_text_display(self.text, timeout)

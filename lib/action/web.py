@@ -86,24 +86,10 @@ class WebAction(CustomWait):
     def browse_page(self, url):
         self.log.info(f"Browser page {url}")
         self._driver.get(url)
-        web_test = getattr(pytest, "web_test")
-        setattr(web_test, "button", Button(self))
-        setattr(web_test, "static", Static(self))
-        setattr(web_test, "text_field", TextField(self))
-        setattr(web_test, "non_ai_button", NonAiButton(self))
-        setattr(web_test, "non_ai_static", NonAiStatic(self))
-        setattr(web_test, "non_ai_text_field", NonAiTextField(self))
-        setattr(web_test, "non_ai_link", NonAiLink(self))
-        setattr(pytest, "web_test", web_test)
 
-    def restart_browser(self, url=None):
+    def restart_browser(self):
         self.log.info(f"Restart browser")
-        self._driver = SeleniumUtils.restart_driver()
-        web_test = getattr(pytest, "web_test")
-        setattr(web_test, "_driver", self._driver)
-        setattr(pytest, "web_test", web_test)
-        if url:
-            self.browse_page(url)
+        return SeleniumUtils.restart_driver()
 
     def check_offset(self):
         v_size = BaseExpectation.get_viewport_size(self._driver)

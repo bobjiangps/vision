@@ -3,15 +3,20 @@ from conf.default import *
 
 class NonAiElementBase:
 
-    def __init__(self, action, identify_type=None, identify_value=None):
-        self._action = action
+    _action = None
+
+    def __init__(self, identify_type=None, identify_value=None):
         self.identify_type = identify_type
         self.identify_value = identify_value
+
+    @classmethod
+    def set_action(cls, value):
+        cls._action = value
 
     def _produce(self):
         # self.__class__(self._action, self.identify_type, self.identify_value)
         # or
-        return type(self)(self._action, self.identify_type, self.identify_value)
+        return type(self)(self.identify_type, self.identify_value)
 
     def element(self):
         return self._action.find_non_ai_element(self.identify_type, self.identify_value)

@@ -1,10 +1,13 @@
 from lib.test_base.conftest import *
+from lib.elements import ElementBase
+from lib.non_ai_elements import NonAiElementBase
+from lib.test_base.page_base import PageBase
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="function", autouse=True)
 def web(logger):
     logger.info("Start web test.......")
-    web_test = type('web_test', (), {})()
+    # web_test = type('web_test', (), {})()
     command_data = getattr(pytest, "command_data")
     url_file = Path.cwd().joinpath("data", "url.yaml")
     home_page = None
@@ -16,12 +19,14 @@ def web(logger):
             pass
     driver = SeleniumUtils.get_driver(command_data["browser"])
     action = WebAction(driver, getattr(pytest, "model"), logger)
-    setattr(web_test, "_driver", driver)
-    setattr(web_test, "action", action)
-    setattr(web_test, "log", logger)
-    setattr(pytest, "web_test", web_test)
+    ElementBase.set_action(action)
+    NonAiElementBase.set_action(action)
+    setattr(PageBase, "_driver", driver)
+    setattr(PageBase, "action", action)
+    setattr(PageBase, "log", logger)
+    setattr(pytest, "web_test", PageBase)
     if home_page:
         action.browse_page(home_page)
-    yield web_test
+    yield PageBase
     logger.info("Exit web test.......")
     SeleniumUtils.quit_driver()

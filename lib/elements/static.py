@@ -3,10 +3,10 @@ from lib.elements.base import ElementBase
 
 class Static(ElementBase):
 
-    def __call__(self, text):
+    def __init__(self, text):
+        super().__init__()
         self.text = text
         self.element_type = self.__class__.__qualname__
-        return self._produce()
 
     def click(self):
         element = self.wait_text_visible()
