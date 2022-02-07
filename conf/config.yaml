@@ -1,12 +1,15 @@
 model:
   weights: elements
   img: page
-  confidence: 0.4
+  confidence: 0.33
   iou: 0.45
   classes:
   agnostic_nms:
   max_det: 100
   line_thickness: 3
+remote:
+  host: 120.78.133.207
+  port: 80
 command_parameter:
   environment: QA
   browser:

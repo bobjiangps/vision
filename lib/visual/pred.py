@@ -1,4 +1,5 @@
 import torch
+import requests
 from lib.visual.experiment import load
 from lib.visual.datasets import LoadImages
 from lib.visual.common import check_img_size, non_max_suppression, scale_coords
@@ -7,10 +8,26 @@ from conf.config import LoadConfig
 from pathlib import Path
 
 
-def init_model(device=torch.device("cpu")):
-    config = LoadConfig().model
-    model = load(Path.cwd().joinpath("resource", "models", f"{config['weights']}.pt"), map_location=device)
-    return model
+def init_model(project="Blog", name=None, device=torch.device("cpu")):
+    if name:
+        model = f"{name}.pt"
+    else:
+        model = f"{LoadConfig().model['weights']}.pt"
+    Path.cwd().joinpath("resource", "models").mkdir(parents=True, exist_ok=True)
+    Path.cwd().joinpath("resource", "img").mkdir(parents=True, exist_ok=True)
+    path = Path.cwd().joinpath("resource", "models", model)
+    if not path.exists():
+        print("model not exist, start download...")
+        r = requests.get(f"{LoadConfig().remote}/{project}/{model}")
+        if r.status_code == 200:
+            with open(path, "wb") as f:
+                f.write(r.content)
+            print("download complete...")
+        else:
+            print(f"download failed with status code: {r.status_code}")
+    else:
+        print("model exist")
+    return load(path, map_location=device)
 
 
 def predict(model, device=torch.device("cpu")):

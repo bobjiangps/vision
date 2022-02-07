@@ -18,6 +18,10 @@ class LoadConfig(Singleton):
         self.data["model"].update(dict_value)
 
     @property
+    def remote(self):
+        return f"http://{self.data['remote']['host']}:{self.data['remote']['port']}/data_models"
+
+    @property
     def command_parameter(self):
         return self.data["command_parameter"]
 
