@@ -19,7 +19,7 @@ class LoadConfig(Singleton):
 
     @property
     def remote(self):
-        return f"http://{self.data['remote']['host']}:{self.data['remote']['port']}/data_models"
+        return f"http://{self.data['remote']['host']}:{self.data['remote']['port']}/static/data_models"
 
     @property
     def command_parameter(self):
