@@ -9,6 +9,9 @@ class NonAILoginPage(PageBase):
         self.password_field = NonAiTextField("id", "password")
         self.login_btn = NonAiButton("xpath", "//input[@id='password']/following-sibling::button[@type='submit']")
         self.error_message = NonAiStatic("xpath", "//p[@style='color:red']")
+        # example about how to pass parameters, or define class inherited from the element class
+        # self.specific_loading_icon = lambda word: LegacyText("id", f"loading_icon_{word}")
+        # self.specific_loading_icon("login").wait_element_invisible()
 
     def fill_account(self, account):
         self.login_link.click()
