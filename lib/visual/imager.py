@@ -26,13 +26,21 @@ class Imager:
         return results, img.shape
 
     @classmethod
-    def recognize_crop_contours(cls, img, crop):
+    def recognize_crop_contours(cls, img, crop, expand=20):
+        result = cls.crop_contours(img, crop)
+        if result == "":
+            crop = (crop[0]-expand, crop[1]-expand, crop[2]+expand, crop[3]+expand)
+            return cls.crop_contours(img, crop)
+        else:
+            return result
+
+    @classmethod
+    def crop_contours(cls, img, crop):
         img = cv2.imread(img)
         crop_img = img[crop[1]:crop[3], crop[0]:crop[2]].copy()
         result = ptr.image_to_string(crop_img).strip()
         if result == "":
             crop_img = cv2.bitwise_not(crop_img)
             _, binary = cv2.threshold(crop_img, 150, 255, cv2.THRESH_BINARY)
-            # result = ptr.image_to_string(binary, config="--oem 3 --psm 4").strip()
             result = ptr.image_to_string(binary, config="--oem 3 --psm 6").strip()
         return result
