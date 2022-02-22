@@ -50,12 +50,12 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until_not(ElementDisplayOnPage(self._model, element, keyword), message)
 
-    def wait_until_element_match(self, element, keyword, timeout=default_timeout):
+    def wait_until_element_match(self, element, keyword, direction, timeout=default_timeout):
         message = f"cannot see --{element}-- on page with keyword --{keyword}-- after wait {timeout} seconds"
         self.log.info(f"Wait the element [{element}] which match [{keyword}] to display")
-        return self.until(ElementMatchOnPage(self._model, element, keyword), message) \
+        return self.until(ElementMatchOnPage(self._model, element, keyword, direction), message) \
             if timeout == self.timeout else \
-            CustomWait(self._driver, timeout).until(ElementMatchOnPage(self._model, element, keyword), message)
+            CustomWait(self._driver, timeout).until(ElementMatchOnPage(self._model, element, keyword, direction), message)
 
     def click(self, element):
         self.log.info("Perform click on the element")

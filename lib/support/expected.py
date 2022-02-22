@@ -27,7 +27,7 @@ class BaseExpectation:
 class TextDisplayOnPage(BaseExpectation):
 
     def __init__(self, text):
-        super(TextDisplayOnPage, self).__init__()
+        super().__init__()
         self.text = text
 
     def __call__(self, driver):
@@ -59,7 +59,7 @@ class TextDisplayOnPage(BaseExpectation):
 class ElementDisplayOnPage(BaseExpectation):
 
     def __init__(self, model, element, keyword=None):
-        super(ElementDisplayOnPage, self).__init__()
+        super().__init__()
         self.model = model
         self.element = element.lower()
         self.keyword = keyword
@@ -83,44 +83,58 @@ class ElementDisplayOnPage(BaseExpectation):
 
 class ElementMatchOnPage(BaseExpectation):
 
-    def __init__(self, model, element, keyword, direction="Down"):
-        super(ElementMatchOnPage, self).__init__()
+    def __init__(self, model, element, keyword, direction):
+        super().__init__()
         self.model = model
         self.element = element.lower()
         self.keyword = keyword
-        self.direction = direction
+        self.direction = direction.lower() if direction else "down"
 
     def __call__(self, driver):
         driver.save_screenshot(self._img)
         match_keyword = None
+        match_area = None
         contours, shape = Imager.recognize_contours(self._img)
         for c in contours:
             for t in self.keyword.split("|"):
                 if c[1].find(t.strip()) >= 0:
                     match_keyword = proportion(center(c[0]), self.get_viewport_size(driver), shape)
+                    match_area = c[0]
+                    break
         if not match_keyword:
             return False
         results, labels, shape = predict(self.model)
         if self.element not in labels.keys():
             return False
-        elements = []
+        relative_elements = {
+            "up": [],
+            "down": [],
+            "left": [],
+            "right": [],
+            "nearby": []
+        }
         for r in results:
             if r["N"] == self.element:
-                elements.append(r["COOR"])
+                if r["COOR"][3] < match_area[3] and r["COOR"][1] < match_area[1]:
+                    relative_elements["up"].append(r["COOR"])
+                elif r["COOR"][3] > match_area[3] and r["COOR"][1] > match_area[1]:
+                    relative_elements["down"].append(r["COOR"])
+                elif r["COOR"][2] < match_area[2] and r["COOR"][0] < match_area[0]:
+                    relative_elements["left"].append(r["COOR"])
+                elif r["COOR"][2] > match_area[2] and r["COOR"][0] > match_area[0]:
+                    relative_elements["right"].append(r["COOR"])
+                else:
+                    relative_elements["nearby"].append(r["COOR"])
         matched_element = None
         distance = None
-        for e in elements:
+        for e in relative_elements[self.direction]:
             position = proportion(center(e), self.get_viewport_size(driver), shape)
             if not matched_element:
                 distance = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
-                matched_element = e
+                matched_element = position
             else:
                 temp = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
                 if temp < distance:
-                    matched_element = e
-        final_match = [match_keyword[0], match_keyword[1]]
-        if matched_element:
-            beyond_distance = proportion(distance_by_direction(matched_element, self.direction), self.get_viewport_size(driver), shape)
-            final_match[0] += beyond_distance[0]
-            final_match[1] += beyond_distance[1]
-        return final_match
+                    matched_element = position
+                    distance = temp
+        return matched_element

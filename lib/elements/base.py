@@ -5,11 +5,12 @@ class ElementBase:
 
     _action = None
 
-    def __init__(self, offset=None, text=None, element_type=None, keyword=None):
+    def __init__(self, offset=None, text=None, element_type=None, keyword=None, direction=None):
         self._offset = [0, 0] if not offset else offset
         self.text = text
         self.element_type = element_type
         self.keyword = keyword
+        self.direction = direction
 
     @classmethod
     def set_action(cls, value):
@@ -30,7 +31,7 @@ class ElementBase:
         return self._action.wait_until_element_disappear(self.element_type, self.keyword, timeout)
 
     def wait_element_match_visible(self, timeout=default_timeout):
-        return self._action.wait_until_element_match(self.element_type, self.keyword, timeout)
+        return self._action.wait_until_element_match(self.element_type, self.keyword, self.direction, timeout)
 
     def action_click(self, element):
         self._action.click((element[0], element[1] + self._offset[1]))
