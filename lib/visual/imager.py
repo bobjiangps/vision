@@ -43,4 +43,6 @@ class Imager:
             crop_img = cv2.bitwise_not(crop_img)
             _, binary = cv2.threshold(crop_img, 150, 255, cv2.THRESH_BINARY)
             result = ptr.image_to_string(binary, config="--oem 3 --psm 6").strip()
+            if result == "":
+                result = ptr.image_to_string(binary, config="--psm 10").strip()
         return result
