@@ -57,6 +57,13 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(ElementMatchOnPage(self._model, element, keyword, direction), message)
 
+    def wait_until_element_match_disappear(self, element, keyword, direction, timeout=default_timeout):
+        message = f"The element --{element}-- still display on page with keyword --{keyword}-- after wait {timeout} seconds"
+        self.log.info(f"Wait the element [{element}] which match [{keyword}] to disappear")
+        return self.until_not(ElementMatchOnPage(self._model, element, keyword, direction), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until_not(ElementMatchOnPage(self._model, element, keyword, direction), message)
+
     def click(self, element):
         self.log.info("Perform click on the element")
         self.action_builder.pointer_action.move_to_location(element[0], element[1])

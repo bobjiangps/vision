@@ -33,6 +33,9 @@ class ElementBase:
     def wait_element_match_visible(self, timeout=default_timeout):
         return self._action.wait_until_element_match(self.element_type, self.keyword, self.direction, timeout)
 
+    def wait_element_match_disappear(self, timeout=default_timeout):
+        return self._action.wait_until_element_match_disappear(self.element_type, self.keyword, self.direction, timeout)
+
     def action_click(self, element):
         self._action.click((element[0], element[1] + self._offset[1]))
 
