@@ -39,7 +39,7 @@ class Imager:
         img = cv2.imread(img)
         crop_img = img[crop[1]:crop[3], crop[0]:crop[2]].copy()
         result = ptr.image_to_string(crop_img).strip()
-        if result == "":
+        if result == "" or result.find("NV") >= 0:
             crop_img = cv2.bitwise_not(crop_img)
             _, binary = cv2.threshold(crop_img, 150, 255, cv2.THRESH_BINARY)
             result = ptr.image_to_string(binary, config="--oem 3 --psm 6").strip()
