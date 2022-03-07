@@ -80,6 +80,15 @@ class WebAction(CustomWait):
         self.action_chains.send_keys(value).perform()
         self.clear_actions(self.action_chains)
 
+    def scroll_to_bottom(self):
+        self._driver.execute_script("window.scrollBy(0,document.body.scrollHeight);")
+
+    def scroll_to_top(self):
+        self._driver.execute_script("window.scrollTo(0, 0);")
+
+    def scroll_by(self, x=0, y=500):
+        self._driver.execute_script(f"window.scrollBy({x}, {y});")
+
     @staticmethod
     # for selenium 3, cannot reset actions
     def clear_actions(item):
