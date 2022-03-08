@@ -115,15 +115,20 @@ class ElementMatchOnPage(BaseExpectation):
         }
         for r in results:
             if r["N"] == self.element:
+                added_flag = False
                 if r["COOR"][3] < match_area[3] and r["COOR"][1] < match_area[1]:
                     relative_elements["up"].append(r["COOR"])
-                elif r["COOR"][3] > match_area[3] and r["COOR"][1] > match_area[1]:
+                    added_flag = True
+                if r["COOR"][3] > match_area[3] and r["COOR"][1] > match_area[1]:
                     relative_elements["down"].append(r["COOR"])
-                elif r["COOR"][2] < match_area[2] and r["COOR"][0] < match_area[0]:
+                    added_flag = True
+                if r["COOR"][2] < match_area[2] and r["COOR"][0] < match_area[0]:
                     relative_elements["left"].append(r["COOR"])
-                elif r["COOR"][2] > match_area[2] and r["COOR"][0] > match_area[0]:
+                    added_flag = True
+                if r["COOR"][2] > match_area[2] and r["COOR"][0] > match_area[0]:
                     relative_elements["right"].append(r["COOR"])
-                else:
+                    added_flag = True
+                if not added_flag:
                     relative_elements["nearby"].append(r["COOR"])
         matched_element = None
         distance = None
