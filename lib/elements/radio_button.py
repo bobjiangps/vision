@@ -8,7 +8,7 @@ class RadioButton(ElementBase):
         super().__init__()
         self.keyword = keyword
         self.direction = direction
-        self.element_type = "_".join(re.findall("[A-Z][^A-Z]*", self.__class__.__qualname__))
+        self.element_type = "_".join(re.findall("[A-Z][^A-Z]*", self.__class__.__base__.__qualname__))
 
     def select(self):
         # todo: unselect and is_selected are not ready
