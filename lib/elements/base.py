@@ -5,12 +5,13 @@ class ElementBase:
 
     _action = None
 
-    def __init__(self, offset=None, text=None, element_type=None, keyword=None, direction=None):
+    def __init__(self, offset=None, text=None, element_type=None, keyword=None, direction=None, beyond=True):
         self._offset = [0, 0] if not offset else offset
         self.text = text
         self.element_type = element_type
         self.keyword = keyword
         self.direction = direction
+        self.beyond = beyond
 
     @classmethod
     def set_action(cls, value):
@@ -41,3 +42,6 @@ class ElementBase:
 
     def action_input(self, element, value):
         self._action.input((element[0], element[1] + self._offset[1]), value)
+
+    def is_visible(self):
+        return self._action.is_displayed(self)

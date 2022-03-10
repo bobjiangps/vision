@@ -6,9 +6,6 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.common.exceptions import MoveTargetOutOfBoundsException
 from utils.selenium_utils import SeleniumUtils
-from lib.elements import *
-from lib.non_ai_elements import *
-import pytest
 
 
 class WebAction(CustomWait):
@@ -79,6 +76,15 @@ class WebAction(CustomWait):
         self.clear_actions(self.action_builder)
         self.action_chains.send_keys(value).perform()
         self.clear_actions(self.action_chains)
+
+    def is_displayed(self, instance):
+        if instance.beyond:
+            return ElementMatchOnPage(self._model, instance.element_type, instance.keyword, instance.direction)
+        else:
+            if instance.text:
+                return TextDisplayOnPage(instance.text)
+            else:
+                return ElementDisplayOnPage(self._model, instance.element_type, instance.keyword)
 
     def scroll_to_bottom(self):
         self._driver.execute_script("window.scrollBy(0,document.body.scrollHeight);")

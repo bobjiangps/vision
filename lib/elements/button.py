@@ -7,6 +7,7 @@ class Button(ElementBase):
         super().__init__()
         self.keyword = keyword
         self.element_type = self.__class__.__base__.__qualname__
+        self.beyond = False
 
     def click(self):
         btn = self.wait_element_visible()
