@@ -11,5 +11,6 @@ class TextField(ElementBase):
         self.element_type = "_".join(re.findall("[A-Z][^A-Z]*", self.__class__.__base__.__qualname__))
 
     def input(self, value):
-        text_field = self.wait_element_match_visible()
-        self.action_input(text_field, value)
+        if value:
+            text_field = self.wait_element_match_visible()
+            self.action_input(text_field, value)
