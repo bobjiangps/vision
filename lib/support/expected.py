@@ -107,39 +107,35 @@ class ElementMatchOnPage(BaseExpectation):
         if self.element not in labels.keys():
             return False
         relative_elements = {
-            "up": [],
-            "down": [],
-            "left": [],
-            "right": [],
-            "nearby": []
+            "up": {"area": [], "edge": []},
+            "down": {"area": [], "edge": []},
+            "left": {"area": [], "edge": []},
+            "right": {"area": [], "edge": []}
         }
         for r in results:
             if r["N"] == self.element:
-                added_flag = False
                 if r["COOR"][3] < match_area[3] and r["COOR"][1] < match_area[1]:
-                    relative_elements["up"].append(r["COOR"])
-                    added_flag = True
+                    relative_elements["up"]["area"].append(r["COOR"])
+                    relative_elements["up"]["edge"].append((r["COOR"][2], r["COOR"][1], r["COOR"][2], r["COOR"][3]))
                 if r["COOR"][3] > match_area[3] and r["COOR"][1] > match_area[1]:
-                    relative_elements["down"].append(r["COOR"])
-                    added_flag = True
+                    relative_elements["down"]["area"].append(r["COOR"])
+                    relative_elements["down"]["edge"].append((r["COOR"][0], r["COOR"][1], r["COOR"][0], r["COOR"][3]))
                 if r["COOR"][2] < match_area[2] and r["COOR"][0] < match_area[0]:
-                    relative_elements["left"].append(r["COOR"])
-                    added_flag = True
+                    relative_elements["left"]["area"].append(r["COOR"])
+                    relative_elements["left"]["edge"].append((r["COOR"][0], r["COOR"][1], r["COOR"][2], r["COOR"][1]))
                 if r["COOR"][2] > match_area[2] and r["COOR"][0] > match_area[0]:
-                    relative_elements["right"].append(r["COOR"])
-                    added_flag = True
-                if not added_flag:
-                    relative_elements["nearby"].append(r["COOR"])
+                    relative_elements["right"]["area"].append(r["COOR"])
+                    relative_elements["right"]["edge"].append((r["COOR"][0], r["COOR"][3], r["COOR"][2], r["COOR"][3]))
         matched_element = None
         distance = None
-        for e in relative_elements[self.direction]:
+        for inx, e in enumerate(relative_elements[self.direction]["edge"]):
             position = proportion(center(e), self.get_viewport_size(driver), shape)
             if not matched_element:
                 distance = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
-                matched_element = position
+                matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
             else:
                 temp = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
                 if temp < distance:
-                    matched_element = position
+                    matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
                     distance = temp
         return matched_element
