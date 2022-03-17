@@ -79,12 +79,12 @@ class WebAction(CustomWait):
 
     def is_displayed(self, instance):
         if instance.beyond:
-            return ElementMatchOnPage(self._model, instance.element_type, instance.keyword, instance.direction)
+            return ElementMatchOnPage(self._model, instance.element_type, instance.keyword, instance.direction)(self._driver)
         else:
             if instance.text:
-                return TextDisplayOnPage(instance.text)
+                return TextDisplayOnPage(instance.text)(self._driver)
             else:
-                return ElementDisplayOnPage(self._model, instance.element_type, instance.keyword)
+                return ElementDisplayOnPage(self._model, instance.element_type, instance.keyword)(self._driver)
 
     def scroll_to_bottom(self):
         self._driver.execute_script("window.scrollBy(0,document.body.scrollHeight);")
