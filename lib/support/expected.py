@@ -107,35 +107,42 @@ class ElementMatchOnPage(BaseExpectation):
         if self.element not in labels.keys():
             return False
         relative_elements = {
-            "up": {"area": [], "edge": []},
-            "down": {"area": [], "edge": []},
-            "left": {"area": [], "edge": []},
-            "right": {"area": [], "edge": []}
+            "up": {"area": [], "edge": [], "orientation": [], "match_orien": (match_area[0], match_area[2])},
+            "down": {"area": [], "edge": [], "orientation": [], "match_orien": (match_area[0], match_area[2])},
+            "left": {"area": [], "edge": [], "orientation": [], "match_orien": (match_area[1], match_area[3])},
+            "right": {"area": [], "edge": [], "orientation": [], "match_orien": (match_area[1], match_area[3])}
         }
         for r in results:
             if r["N"] == self.element:
                 if r["COOR"][3] < match_area[3] and r["COOR"][1] < match_area[1]:
                     relative_elements["up"]["area"].append(r["COOR"])
-                    relative_elements["up"]["edge"].append((r["COOR"][2], r["COOR"][1], r["COOR"][2], r["COOR"][3]))
+                    relative_elements["up"]["edge"].append((r["COOR"][0], r["COOR"][3], r["COOR"][2], r["COOR"][3]))
+                    relative_elements["up"]["orientation"].append((r["COOR"][0], r["COOR"][2]))
                 if r["COOR"][3] > match_area[3] and r["COOR"][1] > match_area[1]:
                     relative_elements["down"]["area"].append(r["COOR"])
-                    relative_elements["down"]["edge"].append((r["COOR"][0], r["COOR"][1], r["COOR"][0], r["COOR"][3]))
+                    relative_elements["down"]["edge"].append((r["COOR"][0], r["COOR"][1], r["COOR"][2], r["COOR"][1]))
+                    relative_elements["down"]["orientation"].append((r["COOR"][0], r["COOR"][2]))
                 if r["COOR"][2] < match_area[2] and r["COOR"][0] < match_area[0]:
                     relative_elements["left"]["area"].append(r["COOR"])
-                    relative_elements["left"]["edge"].append((r["COOR"][0], r["COOR"][1], r["COOR"][2], r["COOR"][1]))
+                    relative_elements["left"]["edge"].append((r["COOR"][2], r["COOR"][1], r["COOR"][2], r["COOR"][3]))
+                    relative_elements["left"]["orientation"].append((r["COOR"][1], r["COOR"][3]))
                 if r["COOR"][2] > match_area[2] and r["COOR"][0] > match_area[0]:
                     relative_elements["right"]["area"].append(r["COOR"])
-                    relative_elements["right"]["edge"].append((r["COOR"][0], r["COOR"][3], r["COOR"][2], r["COOR"][3]))
+                    relative_elements["right"]["edge"].append((r["COOR"][0], r["COOR"][1], r["COOR"][0], r["COOR"][3]))
+                    relative_elements["right"]["orientation"].append((r["COOR"][1], r["COOR"][3]))
         matched_element = None
         distance = None
         for inx, e in enumerate(relative_elements[self.direction]["edge"]):
-            position = proportion(center(e), self.get_viewport_size(driver), shape)
-            if not matched_element:
-                distance = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
-                matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
+            if (relative_elements[self.direction]["match_orien"][0] > relative_elements[self.direction]["orientation"][inx][1]) or (relative_elements[self.direction]["match_orien"][1] < relative_elements[self.direction]["orientation"][inx][0]):
+                continue
             else:
-                temp = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
-                if temp < distance:
+                position = proportion(center(e), self.get_viewport_size(driver), shape)
+                if not matched_element:
+                    distance = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
                     matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
-                    distance = temp
+                else:
+                    temp = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
+                    if temp < distance:
+                        matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
+                        distance = temp
         return matched_element
