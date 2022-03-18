@@ -1,5 +1,4 @@
 from lib.elements.base import ElementBase
-from lib.elements.static import Static
 
 
 class Dropdown(ElementBase):
@@ -10,8 +9,7 @@ class Dropdown(ElementBase):
         self.direction = direction
         self.element_type = self.__class__.__mro__[-3].__qualname__
 
-    def select_item(self, item_name):
+    def select_item(self, name):
         dropdown = self.wait_element_match_visible()
-        self.action_click(dropdown)
-        item = Static(item_name).wait_text_visible()
-        self.action_click(item)
+        self.action_input(dropdown, name)
+        self.action_press_key(dropdown, "enter")

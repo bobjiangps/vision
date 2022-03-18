@@ -38,10 +38,13 @@ class ElementBase:
         return self._action.wait_until_element_match_disappear(self.element_type, self.keyword, self.direction, timeout)
 
     def action_click(self, element):
-        self._action.click((element[0], element[1] + self._offset[1]))
+        self._action.click((element[0] + self._offset[0], element[1] + self._offset[1]))
 
     def action_input(self, element, value):
-        self._action.input((element[0], element[1] + self._offset[1]), value)
+        self._action.input((element[0] + self._offset[0], element[1] + self._offset[1]), value)
+
+    def action_press_key(self, element, key):
+        self._action.press_key((element[0] + self._offset[0], element[1] + self._offset[1]), key)
 
     def is_visible(self):
         return self._action.is_displayed(self)
