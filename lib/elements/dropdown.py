@@ -8,7 +8,7 @@ class Dropdown(ElementBase):
         super().__init__()
         self.keyword = keyword
         self.direction = direction
-        self.element_type = self.__class__.__base__.__qualname__
+        self.element_type = self.__class__.__mro__[-3].__qualname__
 
     def select_item(self, item_name):
         dropdown = self.wait_element_match_visible()

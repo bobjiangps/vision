@@ -7,7 +7,7 @@ class Checkbox(ElementBase):
         super().__init__()
         self.keyword = keyword
         self.direction = direction
-        self.element_type = self.__class__.__base__.__qualname__
+        self.element_type = self.__class__.__mro__[-3].__qualname__
 
     def check(self):
         # todo: uncheck and is_checked are not ready
