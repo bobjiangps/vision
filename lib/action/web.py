@@ -5,6 +5,7 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.common.exceptions import MoveTargetOutOfBoundsException
+from selenium.webdriver.common.keys import Keys
 from utils.selenium_utils import SeleniumUtils
 
 
@@ -76,6 +77,22 @@ class WebAction(CustomWait):
         self.clear_actions(self.action_builder)
         self.action_chains.send_keys(value).perform()
         self.clear_actions(self.action_chains)
+
+    def press_key(self, element, key):
+        keys = {
+            "enter": Keys.ENTER,
+            "down": Keys.DOWN,
+            "up": Keys.UP,
+            "back": Keys.BACK_SPACE
+        }
+        if key.lower() not in keys.keys():
+            self.log.info(f"key [{key}] not supported yet")
+        else:
+            self.log.info(f"press key [{key}] to the element")
+            self.action_builder.pointer_action.move_to_location(element[0], element[1])
+            self.action_builder.perform()
+            self.action_chains.send_keys(keys[key]).perform()
+            self.clear_actions(self.action_chains)
 
     def is_displayed(self, instance):
         if instance.beyond:
