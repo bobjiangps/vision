@@ -145,4 +145,15 @@ class ElementMatchOnPage(BaseExpectation):
                     if temp < distance:
                         matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
                         distance = temp
+        if not matched_element:
+            for inx, e in enumerate(relative_elements[self.direction]["edge"]):
+                position = proportion(center(e), self.get_viewport_size(driver), shape)
+                if not matched_element:
+                    distance = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
+                    matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
+                else:
+                    temp = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
+                    if temp < distance:
+                        matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
+                        distance = temp
         return matched_element
