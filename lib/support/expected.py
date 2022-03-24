@@ -73,7 +73,11 @@ class ElementDisplayOnPage(BaseExpectation):
             if r["N"] == self.element:
                 if self.keyword:
                     for k in self.keyword.split("|"):
-                        if Imager.recognize_crop_contours(self._img, r["COOR"]).find(k.strip()) >= 0:
+                        txt = Imager.recognize_crop_contours(self._img, r["COOR"])
+                        if not txt:
+                            (x, y) = proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
+                            txt = driver.execute_script(f"return document.elementFromPoint({x}, {y});").text
+                        if txt.find(k.strip()) >= 0:
                             return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
                 else:
                     return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
