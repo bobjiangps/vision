@@ -4,7 +4,7 @@ from conf.default import *
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.actions.action_builder import ActionBuilder
-from selenium.common.exceptions import MoveTargetOutOfBoundsException
+from selenium.common.exceptions import MoveTargetOutOfBoundsException, StaleElementReferenceException
 from selenium.webdriver.common.keys import Keys
 from utils.selenium_utils import SeleniumUtils
 
@@ -75,7 +75,12 @@ class WebAction(CustomWait):
         self.action_builder.pointer_action.click()
         self.action_builder.perform()
         self.clear_actions(self.action_builder)
-        self.action_chains.send_keys(value).perform()
+        try:
+            self.action_chains.send_keys(value).perform()
+        except StaleElementReferenceException:
+            element = self._driver.execute_script(f"return document.elementFromPoint({element[0]}, {element[1]});")
+            element.send_keys(Keys.CONTROL + "a", Keys.BACKSPACE)
+            element.send_keys(value)
         self.clear_actions(self.action_chains)
 
     def press_key(self, element, key):
