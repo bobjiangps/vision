@@ -36,19 +36,26 @@ class Imager:
 
     @classmethod
     def crop_contours(cls, img, crop):
+        # todo: notice some different bg color and text color like blue bg and white text
         img = cv2.imread(img)
         crop_img = img[crop[1]:crop[3], crop[0]:crop[2]].copy()
-        result = ptr.image_to_string(crop_img).strip()
-        flag = False
-        special = ["NV", "¢", "] "]
-        for s in special:
-            if result.find(s) >= 0:
-                flag = True
-                break
-        if result == "" or flag:
-            crop_img = cv2.bitwise_not(crop_img)
-            _, binary = cv2.threshold(crop_img, 150, 255, cv2.THRESH_BINARY)
-            result = ptr.image_to_string(binary, config="--oem 3 --psm 6").strip()
-            if result == "":
-                result = ptr.image_to_string(binary, config="--psm 10").strip()
+        crop_img = cv2.bitwise_not(crop_img)
+        _, binary = cv2.threshold(crop_img, 150, 255, cv2.THRESH_BINARY)
+        result = ptr.image_to_string(binary, config="--oem 3 --psm 4").strip()
         return result
+        # img = cv2.imread(img)
+        # crop_img = img[crop[1]:crop[3], crop[0]:crop[2]].copy()
+        # result = ptr.image_to_string(crop_img).strip()
+        # flag = False
+        # special = ["NV", "¢", "] "]
+        # for s in special:
+        #     if result.find(s) >= 0:
+        #         flag = True
+        #         break
+        # if result == "" or flag:
+        #     crop_img = cv2.bitwise_not(crop_img)
+        #     _, binary = cv2.threshold(crop_img, 150, 255, cv2.THRESH_BINARY)
+        #     result = ptr.image_to_string(binary, config="--oem 3 --psm 6").strip()
+        #     if result == "":
+        #         result = ptr.image_to_string(binary, config="--psm 10").strip()
+        # return result
