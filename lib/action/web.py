@@ -20,11 +20,35 @@ class WebAction(CustomWait):
         self.log = logger
         self.timeout = timeout
 
+    def wait_until_display(self, instance, timeout=default_timeout):
+        if instance.beyond:
+            return self.wait_until_element_match(instance.element_type, instance.keyword, instance.direction, timeout)
+        else:
+            if instance.text:
+                return self.wait_until_text_display(instance.text, timeout)
+            else:
+                return self.wait_until_element_display(instance.element_type, instance.keyword, timeout)
+
+    def wait_until_disappear(self, instance, timeout=default_timeout):
+        if instance.beyond:
+            return self.wait_until_element_match_disappear(instance.element_type, instance.keyword, instance.direction, timeout)
+        else:
+            if instance.text:
+                return self.wait_until_text_disappear(instance.text, timeout)
+            else:
+                return self.wait_until_element_disappear(instance.element_type, instance.keyword, timeout)
+
     def wait_until_text_display(self, text, timeout=default_timeout):
         self.log.info(f"Wait the text [{text}] to display")
         return self.until(TextDisplayOnPage(text), f"cannot see --{text}-- on page after wait {timeout} seconds") \
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
+
+    def wait_until_text_disappear(self, text, timeout=default_timeout):
+        self.log.info(f"Wait the text [{text}] to disappear")
+        return self.until_not(TextDisplayOnPage(text), f"The text --{text}-- still display on page after wait {timeout} seconds") \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until_not(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
 
     def wait_until_element_display(self, element, keyword=None, timeout=default_timeout):
         message = f"cannot see --{element}-- on page after wait {timeout} seconds"
