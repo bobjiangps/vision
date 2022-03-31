@@ -10,7 +10,7 @@ class RadioButton(ElementBase):
         self.direction = direction
         self.element_type = "_".join(re.findall("[A-Z][^A-Z]*", self.__class__.__mro__[-3].__qualname__))
 
-    def select(self):
+    def select(self, *args):
         # todo: unselect and is_selected are not ready
-        radio_button = self.wait_element_match_visible()
+        radio_button = self.wait_element_visible()
         self.action_click(radio_button)

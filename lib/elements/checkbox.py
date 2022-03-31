@@ -9,7 +9,7 @@ class Checkbox(ElementBase):
         self.direction = direction
         self.element_type = self.__class__.__mro__[-3].__qualname__
 
-    def check(self):
+    def check(self, *args):
         # todo: uncheck and is_checked are not ready
-        checkbox = self.wait_element_match_visible()
+        checkbox = self.wait_element_visible()
         self.action_click(checkbox)

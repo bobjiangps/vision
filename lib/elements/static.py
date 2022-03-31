@@ -9,10 +9,10 @@ class Static(ElementBase):
         self.element_type = self.__class__.__mro__[-3].__qualname__
         self.beyond = False
 
-    def click(self):
-        element = self.wait_text_visible()
+    def click(self, *args):
+        element = self.wait_element_visible()
         self.action_click(element)
 
-    def input(self, value):
-        element = self.wait_text_visible()
+    def input(self, value, *args):
+        element = self.wait_element_visible()
         self.action_input(element, value)
