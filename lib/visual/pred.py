@@ -8,7 +8,7 @@ from conf.config import LoadConfig
 from pathlib import Path
 
 
-def init_model(project="Blog", name=None, device=torch.device("cpu")):
+def init_model(project="Blog", name=None, remove=False, device=torch.device("cpu")):
     if name:
         model = f"{name}.pt"
     else:
@@ -16,6 +16,8 @@ def init_model(project="Blog", name=None, device=torch.device("cpu")):
     Path.cwd().joinpath("resource", "models").mkdir(parents=True, exist_ok=True)
     Path.cwd().joinpath("resource", "img").mkdir(parents=True, exist_ok=True)
     path = Path.cwd().joinpath("resource", "models", model)
+    if remove:
+        path.unlink()
     if not path.exists():
         print("model not exist, start download...")
         r = requests.get(f"{LoadConfig().remote}/{project}/{model}")
