@@ -34,6 +34,9 @@ class ElementBase:
     def action_input(self, element, value):
         self._action.input((element[0] + self._offset[0], element[1] + self._offset[1]), value)
 
+    def action_clear(self, element):
+        self._action.clear((element[0] + self._offset[0], element[1] + self._offset[1]))
+
     def action_press_key(self, element, key):
         self._action.press_key((element[0] + self._offset[0], element[1] + self._offset[1]), key)
 

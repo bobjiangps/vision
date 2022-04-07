@@ -7,6 +7,7 @@ from selenium.webdriver.common.actions.action_builder import ActionBuilder
 from selenium.common.exceptions import MoveTargetOutOfBoundsException, StaleElementReferenceException
 from selenium.webdriver.common.keys import Keys
 from utils.selenium_utils import SeleniumUtils
+import platform
 
 
 class WebAction(CustomWait):
@@ -105,6 +106,18 @@ class WebAction(CustomWait):
             element = self._driver.execute_script(f"return document.elementFromPoint({element[0]}, {element[1]});")
             element.send_keys(Keys.CONTROL + "a", Keys.BACKSPACE)
             element.send_keys(value)
+        self.clear_actions(self.action_chains)
+
+    def clear(self, element):
+        self.log.info(f"Clear the element")
+        self.action_builder.pointer_action.move_to_location(element[0], element[1])
+        self.action_builder.pointer_action.click()
+        self.action_builder.perform()
+        self.clear_actions(self.action_builder)
+        if platform.system() == "Darwin":
+            self.action_chains.send_keys(Keys.COMMAND + "a", Keys.BACKSPACE).perform()
+        else:
+            self.action_chains.send_keys(Keys.CONTROL + "a", Keys.BACKSPACE).perform()
         self.clear_actions(self.action_chains)
 
     def press_key(self, element, key):

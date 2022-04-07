@@ -14,3 +14,7 @@ class TextField(ElementBase):
         if value:
             text_field = self.wait_element_visible()
             self.action_input(text_field, value)
+
+    def clear(self, *args):
+        text_field = self.wait_element_visible()
+        self.action_clear(text_field)
