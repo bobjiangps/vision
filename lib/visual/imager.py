@@ -6,16 +6,8 @@ class Imager:
 
     @classmethod
     def recognize_contours(cls, img, font="small"):
-        rk_size = {
-            "small": (18, 18),
-            "large": (36, 36)
-        }
         img = cv2.imread(img)
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        ret, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
-        rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, rk_size[font.lower()])
-        dilation = cv2.dilate(thresh, rect_kernel, iterations=1)
-        contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        contours = cls.contours(img, font)
         img_copy = img.copy()
         results = []
         for cnt in contours:
@@ -23,7 +15,50 @@ class Imager:
             cropped = img_copy[y:y + h, x:x + w]
             s = ptr.image_to_string(cropped).strip()
             results.append(((x, y, x + w, y + h), s))
+            if len(s) > 120:
+                img2 = img[y+20:y+h-20, x+20:x+w-20]
+                contours2 = cls.contours(img2, font)
+                img_copy2 = img2.copy()
+                for cnt2 in contours2:
+                    x2, y2, w2, h2 = cv2.boundingRect(cnt2)
+                    cropped2 = img_copy2[y2:y2 + h2, x2:x2 + w2]
+                    s2 = ptr.image_to_string(cropped2).strip()
+                    results.insert(-1, ((x+x2-20, y+y2-20, x+x2+w2+20, y+y2+h2+20), s2))
         return results, img.shape
+
+    @classmethod
+    def contours(cls, img, font):
+        rk_size = {
+            "small": (18, 18),
+            "large": (36, 36)
+        }
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        ret, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
+        rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, rk_size[font.lower()])
+        dilation = cv2.dilate(thresh, rect_kernel, iterations=1)
+        contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        return contours
+
+    # @classmethod
+    # def recognize_contours(cls, img, font="small"):
+    #     rk_size = {
+    #         "small": (18, 18),
+    #         "large": (36, 36)
+    #     }
+    #     img = cv2.imread(img)
+    #     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #     ret, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
+    #     rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, rk_size[font.lower()])
+    #     dilation = cv2.dilate(thresh, rect_kernel, iterations=1)
+    #     contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    #     img_copy = img.copy()
+    #     results = []
+    #     for cnt in contours:
+    #         x, y, w, h = cv2.boundingRect(cnt)
+    #         cropped = img_copy[y:y + h, x:x + w]
+    #         s = ptr.image_to_string(cropped).strip()
+    #         results.append(((x, y, x + w, y + h), s))
+    #     return results, img.shape
 
     @classmethod
     def recognize_crop_contours(cls, img, crop, expand=20):
@@ -42,6 +77,10 @@ class Imager:
         crop_img = cv2.bitwise_not(crop_img)
         _, binary = cv2.threshold(crop_img, 150, 255, cv2.THRESH_BINARY)
         result = ptr.image_to_string(binary, config="--oem 3 --psm 4").strip()
+        for s in [")", "]", "}"]:
+            if result.find(s) >= 0:
+                crop_img = img[crop[1]:crop[3], crop[0]:crop[2]].copy()
+                result = ptr.image_to_string(crop_img).strip()
         return result
         # img = cv2.imread(img)
         # crop_img = img[crop[1]:crop[3], crop[0]:crop[2]].copy()
