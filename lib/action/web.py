@@ -115,9 +115,9 @@ class WebAction(CustomWait):
         self.action_builder.perform()
         self.clear_actions(self.action_builder)
         if platform.system() == "Darwin":
-            self.action_chains.send_keys(Keys.COMMAND + "a", Keys.BACKSPACE).perform()
+            self.action_chains.key_down(Keys.COMMAND).key_down('a').key_up(Keys.COMMAND).key_up('a').send_keys(Keys.BACKSPACE).perform()
         else:
-            self.action_chains.send_keys(Keys.CONTROL + "a", Keys.BACKSPACE).perform()
+            self.action_chains.key_down(Keys.CONTROL).key_down('a').key_up(Keys.CONTROL).key_up('a').send_keys(Keys.BACKSPACE).perform()
         self.clear_actions(self.action_chains)
 
     def press_key(self, element, key):
