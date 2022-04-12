@@ -99,12 +99,16 @@ class ElementMatchOnPage(BaseExpectation):
         match_keyword = None
         match_area = None
         contours, shape = Imager.recognize_contours(self._img)
+        exit_flag = False
         for c in contours:
             for t in self.keyword.split("|"):
                 if c[1].find(t.strip()) >= 0:
                     match_keyword = proportion(center(c[0]), self.get_viewport_size(driver), shape)
                     match_area = c[0]
+                    exit_flag = True
                     break
+            if exit_flag:
+                break
         if not match_keyword:
             return False
         results, labels, shape = predict(self.model)
