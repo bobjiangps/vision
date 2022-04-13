@@ -11,7 +11,8 @@ class Dropdown(ElementBase):
 
     def select_item(self, name, *args):
         dropdown = self.wait_element_visible()
-        self.action_input(dropdown, name)
+        self.action_click(dropdown)
+        self.action_send_value(dropdown, name.lower())
         self.action_press_key(dropdown, "enter")
 
     def click(self, *args):

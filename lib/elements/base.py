@@ -40,5 +40,8 @@ class ElementBase:
     def action_press_key(self, element, key):
         self._action.press_key((element[0] + self._offset[0], element[1] + self._offset[1]), key)
 
+    def action_send_value(self, element, value):
+        self._action.send_value((element[0] + self._offset[0], element[1] + self._offset[1]), value)
+
     def is_visible(self):
         return self._action.is_displayed(self)
