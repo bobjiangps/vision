@@ -120,6 +120,14 @@ class WebAction(CustomWait):
             self.action_chains.key_down(Keys.CONTROL).key_down('a').key_up(Keys.CONTROL).key_up('a').send_keys(Keys.BACKSPACE).perform()
         self.clear_actions(self.action_chains)
 
+    def send_value(self, element, value):
+        self.log.info(f"Send [{value}] to the element")
+        self.action_builder.pointer_action.move_to_location(element[0], element[1])
+        self.action_builder.perform()
+        self.clear_actions(self.action_builder)
+        self.action_chains.send_keys(value).perform()
+        self.clear_actions(self.action_chains)
+
     def press_key(self, element, key):
         keys = {
             "enter": Keys.ENTER,
