@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from conf.config import LoadConfig
 
 
 class Ensemble(nn.ModuleList):
@@ -16,8 +17,18 @@ class Ensemble(nn.ModuleList):
 
 def load(weights, map_location=None):
     model = Ensemble()
-    ckpt = torch.load(weights, map_location=map_location)
-    model.append(ckpt['ema' if ckpt.get('ema') else 'model'].float().fuse().eval())
+    if str(weights).endswith(".pt"):
+        ckpt = torch.load(weights, map_location=map_location)
+        model.append(ckpt['ema' if ckpt.get('ema') else 'model'].float().fuse().eval())
+    else:
+        from lib.visual.model import Model
+        # ckpt = Model("yolov5s.yaml", 3, 6, None).to("cpu")
+        ckpt = Model(LoadConfig().model, 3, 6, None).to("cpu")
+        ckpt.load_state_dict(torch.load(weights, map_location=map_location))
+        ckpt.eval()
+        ckpt.names = LoadConfig().model["n"]
+        model.append(ckpt)
+
     if len(model) == 1:
         return model[-1]
     else:

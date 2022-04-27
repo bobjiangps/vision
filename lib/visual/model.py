@@ -58,7 +58,7 @@ class Detect(nn.Module):
 
 
 class Model(nn.Module):
-    def __init__(self, cfg='yolov5s.yaml', ch=3, nc=None, anchors=None):
+    def __init__(self, cfg={}, ch=3, nc=None, anchors=None):
         super(Model, self).__init__()
         if isinstance(cfg, dict):
             self.yaml = cfg
