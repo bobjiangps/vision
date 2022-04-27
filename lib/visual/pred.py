@@ -8,11 +8,12 @@ from conf.config import LoadConfig
 from pathlib import Path
 
 
-def init_model(project="Blog", name=None, remove=False, device=torch.device("cpu")):
+def init_model(project="Blog", name=None, remove=False, state=False, device=torch.device("cpu")):
+    suffix = "pt" if state else "pth"
     if name:
-        model = f"{name}.pt"
+        model = f"{name}.{suffix}"
     else:
-        model = f"{LoadConfig().model['weights']}.pt"
+        model = f"{LoadConfig().model['weights']}.{suffix}"
     Path.cwd().joinpath("resource", "models").mkdir(parents=True, exist_ok=True)
     Path.cwd().joinpath("resource", "img").mkdir(parents=True, exist_ok=True)
     path = Path.cwd().joinpath("resource", "models", model)
