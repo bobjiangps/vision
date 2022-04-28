@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 def init_model(project="Blog", name=None, remove=False, state=False, device=torch.device("cpu")):
-    suffix = "pt" if state else "pth"
+    suffix = "pth" if state else "pt"
     if name:
         model = f"{name}.{suffix}"
     else:
