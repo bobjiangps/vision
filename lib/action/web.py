@@ -247,3 +247,6 @@ class WebAction(CustomWait):
     def input_non_ai_element(self, element, value):
         self.log.info(f"Input [{value}] to the element")
         element.send_keys(value)
+
+    def common_option_non_ai_element(self, name):
+        return self.find_non_ai_element("xpath", f"//ul[contains(@class, 'show')]//li//a[text()='{name}']")
