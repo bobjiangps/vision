@@ -249,4 +249,5 @@ class WebAction(CustomWait):
         element.send_keys(value)
 
     def common_option_non_ai_element(self, name):
-        return self.find_non_ai_element("xpath", f"//ul[contains(@class, 'show')]//li//a[text()='{name}']")
+        e = self.find_non_ai_element("xpath", f"//ul[contains(@class, 'show')]//li//a[text()='{name}']")
+        return e[0] if len(e) > 0 else None
