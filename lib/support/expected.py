@@ -1,12 +1,16 @@
 from lib.visual.imager import Imager
-from lib.visual.common import center, proportion, distance_by_direction
+from lib.visual.common import center, proportion
 from lib.support.exceptions import NotVisibleException
 from lib.visual.pred import predict
-from pathlib import Path
 from conf.config import LoadConfig
+from pathlib import Path
+import json
+import base64
 
 
 class BaseExpectation:
+
+    FULL_SCREEN = False
 
     def __init__(self):
         self._img = str(Path.cwd().joinpath("resource", "img", f"{LoadConfig().model['img']}.png"))
@@ -23,6 +27,47 @@ class BaseExpectation:
         size = body.size
         return [size["width"], size["height"]]
 
+    def save_full_screenshot(self, driver):
+        def send(cmd, params):
+            resource = "/session/%s/chromium/send_command_and_get_result" % driver.session_id
+            url = driver.command_executor._url + resource
+            body = json.dumps({"cmd":cmd, "params": params})
+            response = driver.command_executor._request("POST", url, body)
+            return response.get("value")
+
+        def evaluate(script):
+            response = send("Runtime.evaluate", {"returnByValue": True, "expression": script})
+            return response["result"]["value"]
+
+        if hasattr(driver, "get_full_page_screenshot_as_file"):
+            driver.get_full_page_screenshot_as_file(self._img)
+        else:
+            if driver.name.lower() == "chrome":
+                metrics = evaluate(
+                    "({" + \
+                    "width: Math.max(window.innerWidth, document.body.scrollWidth, document.documentElement.scrollWidth)|0," + \
+                    "height: Math.max(innerHeight, document.body.scrollHeight, document.documentElement.scrollHeight)|0," + \
+                    "deviceScaleFactor: window.devicePixelRatio || 1," + \
+                    "mobile: typeof window.orientation !== 'undefined'" + \
+                    "})")
+                send("Emulation.setDeviceMetricsOverride", metrics)
+                screenshot = send("Page.captureScreenshot", {"format": "png", "fromSurface": True})
+                send("Emulation.clearDeviceMetricsOverride", {})
+                with open(self._img, 'wb') as f:
+                    f.write(base64.b64decode(screenshot['data']))
+            elif driver.name.lower() == "firefox":
+                resource = "/session/%s/moz/screenshot/full" % driver.session_id
+                url = driver.command_executor._url + resource
+                content = driver.command_executor._request("GET", url)
+                with open(self._img, 'wb') as f:
+                    f.write(base64.b64decode(content["value"]))
+            else:
+                driver.save_screenshot(self._img)
+
+    @staticmethod
+    def scroll_into_view(driver, position):
+        driver.execute_script(f"window.scrollTo({position[0]}, {position[1]});")
+
 
 class TextDisplayOnPage(BaseExpectation):
 
@@ -31,12 +76,20 @@ class TextDisplayOnPage(BaseExpectation):
         self.text = text
 
     def __call__(self, driver):
-        driver.save_screenshot(self._img)
+        if self.FULL_SCREEN:
+            self.save_full_screenshot(driver)
+        else:
+            driver.save_screenshot(self._img)
         contours, shape = Imager.recognize_contours(self._img)
         for t in self.text.split("|"):
             for c in contours:
                 if c[1].find(t.strip()) >= 0:
-                    return proportion(center(c[0]), self.get_viewport_size(driver), shape)
+                    if self.FULL_SCREEN:
+                        self.FULL_SCREEN = False
+                        self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
+                        return False
+                    else:
+                        return proportion(center(c[0]), self.get_viewport_size(driver), shape)
         words = []
         double_check = False
         for t in self.text.split("|"):
@@ -51,7 +104,13 @@ class TextDisplayOnPage(BaseExpectation):
             for t in self.text.split("|"):
                 for c in contours:
                     if c[1].find(t.strip()) >= 0:
-                        return proportion(center(c[0]), self.get_viewport_size(driver), shape)
+                        if self.FULL_SCREEN:
+                            self.FULL_SCREEN = False
+                            self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
+                            return False
+                        else:
+                            return proportion(center(c[0]), self.get_viewport_size(driver), shape)
+        self.FULL_SCREEN = True
         # raise NotVisibleException("text NOT visible")
         return False
 
@@ -65,22 +124,36 @@ class ElementDisplayOnPage(BaseExpectation):
         self.keyword = keyword
 
     def __call__(self, driver):
-        driver.save_screenshot(self._img)
+        if self.FULL_SCREEN:
+            self.save_full_screenshot(driver)
+        else:
+            driver.save_screenshot(self._img)
         results, labels, shape = predict(self.model)
         if self.element not in labels.keys():
             return False
         for r in results:
             if r["N"] == self.element:
                 if self.keyword:
-                    txt = Imager.recognize_crop_contours(self._img, r["COOR"])
+                    tmp = Imager.recognize_crop_contours(self._img, r["COOR"])
                     for k in self.keyword.split("|"):
-                        if not txt:
+                        if not tmp:
                             (x, y) = proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
-                            txt = driver.execute_script(f"return document.elementFromPoint({x}, {y});").text
-                        if txt.find(k.strip()) >= 0:
-                            return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
+                            tmp = driver.execute_script(f"return document.elementFromPoint({x}, {y});").text
+                        if tmp.find(k.strip()) >= 0:
+                            if self.FULL_SCREEN:
+                                self.FULL_SCREEN = False
+                                self.scroll_into_view(driver, proportion(center(r["COOR"]), self.get_body_size(driver), shape))
+                                return False
+                            else:
+                                return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
                 else:
-                    return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
+                    if self.FULL_SCREEN:
+                        self.FULL_SCREEN = False
+                        self.scroll_into_view(driver, proportion(center(r["COOR"]), self.get_body_size(driver), shape))
+                        return False
+                    else:
+                        return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
+        self.FULL_SCREEN = True
         # raise NotVisibleException("text NOT visible")
         return False
 
@@ -95,7 +168,10 @@ class ElementMatchOnPage(BaseExpectation):
         self.direction = direction.lower() if direction else "down"
 
     def __call__(self, driver):
-        driver.save_screenshot(self._img)
+        if self.FULL_SCREEN:
+            self.save_full_screenshot(driver)
+        else:
+            driver.save_screenshot(self._img)
         match_keyword = None
         match_area = None
         contours, shape = Imager.recognize_contours(self._img)
@@ -103,6 +179,10 @@ class ElementMatchOnPage(BaseExpectation):
         for c in contours:
             for t in self.keyword.split("|"):
                 if c[1].find(t.strip()) >= 0:
+                    if self.FULL_SCREEN:
+                        self.FULL_SCREEN = False
+                        self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
+                        return False
                     match_keyword = proportion(center(c[0]), self.get_viewport_size(driver), shape)
                     match_area = c[0]
                     exit_flag = True
@@ -110,9 +190,11 @@ class ElementMatchOnPage(BaseExpectation):
             if exit_flag:
                 break
         if not match_keyword:
+            self.FULL_SCREEN = True
             return False
         results, labels, shape = predict(self.model)
         if self.element not in labels.keys():
+            self.FULL_SCREEN = True
             return False
         relative_elements = {
             "up": {"area": [], "edge": [], "orientation": [], "match_orien": (match_area[0], match_area[2])},
@@ -164,4 +246,5 @@ class ElementMatchOnPage(BaseExpectation):
                     if temp < distance:
                         matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
                         distance = temp
+        self.FULL_SCREEN = False
         return matched_element
