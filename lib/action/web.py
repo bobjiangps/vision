@@ -12,10 +12,10 @@ import platform
 
 class WebAction(CustomWait):
 
-    def __init__(self, driver, model, logger, timeout=default_timeout):
+    def __init__(self, driver, models, logger, timeout=default_timeout):
         super().__init__(driver, timeout)
         self._driver = driver
-        self._model = model
+        self._model = models
         self.action_chains = ActionChains(self._driver)
         self.action_builder = ActionBuilder(self._driver)
         self.log = logger
@@ -52,40 +52,56 @@ class WebAction(CustomWait):
             CustomWait(self._driver, timeout).until_not(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
 
     def wait_until_element_display(self, element, keyword=None, timeout=default_timeout):
+        if isinstance(self._model, list):
+            model = self._model[1] if element.lower() == "icon" else self._model[0]
+        else:
+            model = self._model
         message = f"cannot see --{element}-- on page after wait {timeout} seconds"
         if keyword:
             message += f" with keyword --{keyword}--"
             self.log.info(f"Wait the element [{element}] identified by [{keyword}] to display")
         else:
             self.log.info(f"Wait the element [{element}] to display")
-        return self.until(ElementDisplayOnPage(self._model, element, keyword), message) \
+        return self.until(ElementDisplayOnPage(model, element, keyword), message) \
             if timeout == self.timeout else \
-            CustomWait(self._driver, timeout).until(ElementDisplayOnPage(self._model, element, keyword), message)
+            CustomWait(self._driver, timeout).until(ElementDisplayOnPage(model, element, keyword), message)
 
     def wait_until_element_disappear(self, element, keyword=None, timeout=default_timeout):
+        if isinstance(self._model, list):
+            model = self._model[1] if element.lower() == "icon" else self._model[0]
+        else:
+            model = self._model
         message = f"The element --{element}-- still display on page after wait {timeout} seconds"
         if keyword:
             message += f" with keyword --{keyword}--"
             self.log.info(f"Wait the element [{element}] identified by [{keyword}] to disappear")
         else:
             self.log.info(f"Wait the element [{element}] to disappear")
-        return self.until_not(ElementDisplayOnPage(self._model, element, keyword), message) \
+        return self.until_not(ElementDisplayOnPage(model, element, keyword), message) \
             if timeout == self.timeout else \
-            CustomWait(self._driver, timeout).until_not(ElementDisplayOnPage(self._model, element, keyword), message)
+            CustomWait(self._driver, timeout).until_not(ElementDisplayOnPage(model, element, keyword), message)
 
     def wait_until_element_match(self, element, keyword, direction, timeout=default_timeout):
+        if isinstance(self._model, list):
+            model = self._model[1] if element.lower() == "icon" else self._model[0]
+        else:
+            model = self._model
         message = f"cannot see --{element}-- on page with keyword --{keyword}-- after wait {timeout} seconds"
         self.log.info(f"Wait the element [{element}] which match [{keyword}] to display")
-        return self.until(ElementMatchOnPage(self._model, element, keyword, direction), message) \
+        return self.until(ElementMatchOnPage(model, element, keyword, direction), message) \
             if timeout == self.timeout else \
-            CustomWait(self._driver, timeout).until(ElementMatchOnPage(self._model, element, keyword, direction), message)
+            CustomWait(self._driver, timeout).until(ElementMatchOnPage(model, element, keyword, direction), message)
 
     def wait_until_element_match_disappear(self, element, keyword, direction, timeout=default_timeout):
+        if isinstance(self._model, list):
+            model = self._model[1] if element.lower() == "icon" else self._model[0]
+        else:
+            model = self._model
         message = f"The element --{element}-- still display on page with keyword --{keyword}-- after wait {timeout} seconds"
         self.log.info(f"Wait the element [{element}] which match [{keyword}] to disappear")
-        return self.until_not(ElementMatchOnPage(self._model, element, keyword, direction), message) \
+        return self.until_not(ElementMatchOnPage(model, element, keyword, direction), message) \
             if timeout == self.timeout else \
-            CustomWait(self._driver, timeout).until_not(ElementMatchOnPage(self._model, element, keyword, direction), message)
+            CustomWait(self._driver, timeout).until_not(ElementMatchOnPage(model, element, keyword, direction), message)
 
     def click(self, element):
         self.log.info("Perform click on the element")
@@ -145,13 +161,17 @@ class WebAction(CustomWait):
             self.clear_actions(self.action_chains)
 
     def is_displayed(self, instance):
+        if isinstance(self._model, list):
+            model = self._model[1] if instance.element_type.lower() == "icon" else self._model[0]
+        else:
+            model = self._model
         if instance.beyond:
-            return ElementMatchOnPage(self._model, instance.element_type, instance.keyword, instance.direction)(self._driver)
+            return ElementMatchOnPage(model, instance.element_type, instance.keyword, instance.direction)(self._driver)
         else:
             if instance.text:
                 return TextDisplayOnPage(instance.text)(self._driver)
             else:
-                return ElementDisplayOnPage(self._model, instance.element_type, instance.keyword)(self._driver)
+                return ElementDisplayOnPage(model, instance.element_type, instance.keyword)(self._driver)
 
     def scroll_to_bottom(self):
         self._driver.execute_script("window.scrollBy(0,document.body.scrollHeight);")
