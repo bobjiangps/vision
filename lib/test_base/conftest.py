@@ -40,6 +40,9 @@ def pytest_configure(config):
     logger.info("loading model...")
     setattr(pytest, "model", init_model())
     # setattr(pytest, "model", init_model(name="state", remove=True, state=True))
+    # em = init_model(name="elements")
+    # im = init_model(name="icons")
+    # setattr(pytest, "model", [em, im])
     logger.info("model loaded...")
     command_data = getattr(pytest, "command_data")
     if hasattr(config, '_metadata'):
