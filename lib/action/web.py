@@ -23,21 +23,21 @@ class WebAction(CustomWait):
 
     def wait_until_display(self, instance, timeout=default_timeout):
         if instance.beyond:
-            return self.wait_until_element_match(instance.element_type, instance.keyword, instance.direction, timeout)
+            return self.wait_until_element_match(instance, timeout)
         else:
             if instance.text:
                 return self.wait_until_text_display(instance.text, timeout)
             else:
-                return self.wait_until_element_display(instance.element_type, instance.keyword, timeout)
+                return self.wait_until_element_display(instance, timeout)
 
     def wait_until_disappear(self, instance, timeout=default_timeout):
         if instance.beyond:
-            return self.wait_until_element_match_disappear(instance.element_type, instance.keyword, instance.direction, timeout)
+            return self.wait_until_element_match_disappear(instance, timeout)
         else:
             if instance.text:
                 return self.wait_until_text_disappear(instance.text, timeout)
             else:
-                return self.wait_until_element_disappear(instance.element_type, instance.keyword, timeout)
+                return self.wait_until_element_disappear(instance, timeout)
 
     def wait_until_text_display(self, text, timeout=default_timeout):
         self.log.info(f"Wait the text [{text}] to display")
@@ -51,11 +51,13 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until_not(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
 
-    def wait_until_element_display(self, element, keyword=None, timeout=default_timeout):
+    def wait_until_element_display(self, instance, timeout=default_timeout):
         if isinstance(self._model, list):
-            model = self._model[1] if element.lower() == "icon" else self._model[0]
+            model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
             model = self._model
+        element = instance.category if hasattr(instance, "category") else instance.element_type
+        keyword = instance.keyword
         message = f"cannot see --{element}-- on page after wait {timeout} seconds"
         if keyword:
             message += f" with keyword --{keyword}--"
@@ -66,11 +68,13 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(ElementDisplayOnPage(model, element, keyword), message)
 
-    def wait_until_element_disappear(self, element, keyword=None, timeout=default_timeout):
+    def wait_until_element_disappear(self, instance, timeout=default_timeout):
         if isinstance(self._model, list):
-            model = self._model[1] if element.lower() == "icon" else self._model[0]
+            model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
             model = self._model
+        element = instance.category if hasattr(instance, "category") else instance.element_type
+        keyword = instance.keyword
         message = f"The element --{element}-- still display on page after wait {timeout} seconds"
         if keyword:
             message += f" with keyword --{keyword}--"
@@ -81,22 +85,28 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until_not(ElementDisplayOnPage(model, element, keyword), message)
 
-    def wait_until_element_match(self, element, keyword, direction, timeout=default_timeout):
+    def wait_until_element_match(self, instance, timeout=default_timeout):
         if isinstance(self._model, list):
-            model = self._model[1] if element.lower() == "icon" else self._model[0]
+            model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
             model = self._model
+        element = instance.category if hasattr(instance, "category") else instance.element_type
+        keyword = instance.keyword
+        direction = instance.direction
         message = f"cannot see --{element}-- on page with keyword --{keyword}-- after wait {timeout} seconds"
         self.log.info(f"Wait the element [{element}] which match [{keyword}] to display")
         return self.until(ElementMatchOnPage(model, element, keyword, direction), message) \
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(ElementMatchOnPage(model, element, keyword, direction), message)
 
-    def wait_until_element_match_disappear(self, element, keyword, direction, timeout=default_timeout):
+    def wait_until_element_match_disappear(self, instance, timeout=default_timeout):
         if isinstance(self._model, list):
-            model = self._model[1] if element.lower() == "icon" else self._model[0]
+            model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
             model = self._model
+        element = instance.category if hasattr(instance, "category") else instance.element_type
+        keyword = instance.keyword
+        direction = instance.direction
         message = f"The element --{element}-- still display on page with keyword --{keyword}-- after wait {timeout} seconds"
         self.log.info(f"Wait the element [{element}] which match [{keyword}] to disappear")
         return self.until_not(ElementMatchOnPage(model, element, keyword, direction), message) \
@@ -162,16 +172,17 @@ class WebAction(CustomWait):
 
     def is_displayed(self, instance):
         if isinstance(self._model, list):
-            model = self._model[1] if instance.element_type.lower() == "icon" else self._model[0]
+            model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
             model = self._model
+        element = instance.category if hasattr(instance, "category") else instance.element_type
         if instance.beyond:
-            return ElementMatchOnPage(model, instance.element_type, instance.keyword, instance.direction)(self._driver)
+            return ElementMatchOnPage(model, element, instance.keyword, instance.direction)(self._driver)
         else:
             if instance.text:
                 return TextDisplayOnPage(instance.text)(self._driver)
             else:
-                return ElementDisplayOnPage(model, instance.element_type, instance.keyword)(self._driver)
+                return ElementDisplayOnPage(model, element, instance.keyword)(self._driver)
 
     def scroll_to_bottom(self):
         self._driver.execute_script("window.scrollBy(0,document.body.scrollHeight);")
