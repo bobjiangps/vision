@@ -2,6 +2,7 @@ from lib.visual.imager import Imager
 from lib.visual.common import center, proportion
 from lib.support.exceptions import NotVisibleException
 from lib.visual.pred import predict
+from lib.support.deviation import *
 from conf.config import LoadConfig
 from pathlib import Path
 import json
@@ -83,7 +84,7 @@ class TextDisplayOnPage(BaseExpectation):
         contours, shape = Imager.recognize_contours(self._img)
         for t in self.text.split("|"):
             for c in contours:
-                if c[1].find(t.strip()) >= 0:
+                if c[1].find(t.strip()) >= 0  or qualified(c[1], t):
                     if self.FULL_SCREEN:
                         self.FULL_SCREEN = False
                         self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
@@ -103,7 +104,7 @@ class TextDisplayOnPage(BaseExpectation):
             contours, shape = Imager.recognize_contours(self._img, font="large")
             for t in self.text.split("|"):
                 for c in contours:
-                    if c[1].find(t.strip()) >= 0:
+                    if c[1].find(t.strip()) >= 0 or qualified(c[1], t):
                         if self.FULL_SCREEN:
                             self.FULL_SCREEN = False
                             self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
