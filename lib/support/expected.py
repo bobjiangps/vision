@@ -84,7 +84,7 @@ class TextDisplayOnPage(BaseExpectation):
         contours, shape = Imager.recognize_contours(self._img)
         for t in self.text.split("|"):
             for c in contours:
-                if c[1].find(t.strip()) >= 0  or qualified(c[1], t):
+                if c[1].find(t.strip()) >= 0 or qualified(c[1], t):
                     if self.FULL_SCREEN:
                         self.FULL_SCREEN = False
                         self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
@@ -140,7 +140,7 @@ class ElementDisplayOnPage(BaseExpectation):
                         if not tmp:
                             (x, y) = proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
                             tmp = driver.execute_script(f"return document.elementFromPoint({x}, {y});").text
-                        if tmp.find(k.strip()) >= 0:
+                        if tmp.find(k.strip()) >= 0 or qualified(tmp, k):
                             if self.FULL_SCREEN:
                                 self.FULL_SCREEN = False
                                 self.scroll_into_view(driver, proportion(center(r["COOR"]), self.get_body_size(driver), shape))
@@ -179,7 +179,7 @@ class ElementMatchOnPage(BaseExpectation):
         exit_flag = False
         for c in contours:
             for t in self.keyword.split("|"):
-                if c[1].find(t.strip()) >= 0:
+                if c[1].find(t.strip()) >= 0 or qualified(c[1], t):
                     if self.FULL_SCREEN:
                         self.FULL_SCREEN = False
                         self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
