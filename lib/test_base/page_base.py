@@ -21,4 +21,5 @@ class PageBase:
     @classmethod
     def browse_page(cls, url):
         cls.log.info(f"Browser page {url}")
+        cls._driver.maximize_window()
         cls._driver.get(url)
