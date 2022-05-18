@@ -1,7 +1,7 @@
 model:
   weights: elements
   img: page
-  confidence: 0.33
+  confidence: 0.38
   iou: 0.45
   classes:
   agnostic_nms:
