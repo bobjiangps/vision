@@ -1,5 +1,6 @@
 import cv2
 import pytesseract as ptr
+import platform
 
 
 class Imager:
@@ -28,10 +29,16 @@ class Imager:
 
     @classmethod
     def contours(cls, img, font):
-        rk_size = {
-            "small": (18, 18),
-            "large": (36, 36)
-        }
+        if platform.platform().lower().find("windows") >= 0:
+            rk_size = {
+                "small": (14, 14),
+                "large": (28, 28)
+            }
+        else:
+            rk_size = {
+                "small": (16, 16),
+                "large": (32, 32)
+            }
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         ret, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
         rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, rk_size[font.lower()])
