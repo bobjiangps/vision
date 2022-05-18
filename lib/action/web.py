@@ -113,6 +113,39 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until_not(ElementMatchOnPage(model, element, keyword, direction), message)
 
+    def wait_until_elements_display(self, instance, timeout=default_timeout):
+        if isinstance(self._model, list):
+            model = self._model[1] if hasattr(instance, "category") else self._model[0]
+        else:
+            model = self._model
+        if instance.beyond:
+            element = instance.category if hasattr(instance, "category") else instance.element_type
+            keyword = instance.keyword
+            direction = instance.direction
+            message = f"cannot see elements --{element}-- on page with keyword --{keyword}-- after wait {timeout} seconds"
+            self.log.info(f"Wait the elements [{element}] which match [{keyword}] to display")
+            return self.until(ElementMatchOnPage(model, element, keyword, direction, multiple=True), message) \
+                if timeout == self.timeout else \
+                CustomWait(self._driver, timeout).until(ElementMatchOnPage(model, element, keyword, direction, multiple=True), message)
+        else:
+            if instance.text:
+                self.log.info(f"Wait the texts [{instance.text}] to display")
+                return self.until(TextDisplayOnPage(instance.text, multiple=True), f"cannot see --{instance.text}-- on page after wait {timeout} seconds") \
+                    if timeout == self.timeout else \
+                    CustomWait(self._driver, timeout).until(TextDisplayOnPage(instance.text, multiple=True), f"cannot see --{instance.text}-- on page")
+            else:
+                element = instance.category if hasattr(instance, "category") else instance.element_type
+                keyword = instance.keyword
+                message = f"cannot see elements --{element}-- on page after wait {timeout} seconds"
+                if keyword:
+                    message += f" with keyword --{keyword}--"
+                    self.log.info(f"Wait the elements [{element}] identified by [{keyword}] to display")
+                else:
+                    self.log.info(f"Wait the elements [{element}] to display")
+                return self.until(ElementDisplayOnPage(model, element, keyword, multiple=True), message) \
+                    if timeout == self.timeout else \
+                    CustomWait(self._driver, timeout).until(ElementDisplayOnPage(model, element, keyword, multiple=True), message)
+
     def click(self, element):
         self.log.info("Perform click on the element")
         self.action_builder.pointer_action.move_to_location(element[0], element[1])

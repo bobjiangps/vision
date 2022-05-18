@@ -72,9 +72,11 @@ class BaseExpectation:
 
 class TextDisplayOnPage(BaseExpectation):
 
-    def __init__(self, text):
+    def __init__(self, text, multiple=False):
         super().__init__()
         self.text = text
+        self.multiple = multiple
+        self.elements = []
 
     def __call__(self, driver):
         if self.FULL_SCREEN:
@@ -90,7 +92,10 @@ class TextDisplayOnPage(BaseExpectation):
                         self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
                         return False
                     else:
-                        return proportion(center(c[0]), self.get_viewport_size(driver), shape)
+                        if self.multiple:
+                            self.elements.append(proportion(center(c[0]), self.get_viewport_size(driver), shape))
+                        else:
+                            return proportion(center(c[0]), self.get_viewport_size(driver), shape)
         words = []
         double_check = False
         for t in self.text.split("|"):
@@ -110,19 +115,26 @@ class TextDisplayOnPage(BaseExpectation):
                             self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
                             return False
                         else:
-                            return proportion(center(c[0]), self.get_viewport_size(driver), shape)
+                            if self.multiple:
+                                self.elements.append(proportion(center(c[0]), self.get_viewport_size(driver), shape))
+                            else:
+                                return proportion(center(c[0]), self.get_viewport_size(driver), shape)
         self.FULL_SCREEN = True
         # raise NotVisibleException("text NOT visible")
+        if len(self.elements) > 0:
+            return self.elements
         return False
 
 
 class ElementDisplayOnPage(BaseExpectation):
 
-    def __init__(self, model, element, keyword=None):
+    def __init__(self, model, element, keyword=None, multiple=False):
         super().__init__()
         self.model = model
         self.element = element.lower()
         self.keyword = keyword
+        self.multiple = multiple
+        self.elements = []
 
     def __call__(self, driver):
         if self.FULL_SCREEN:
@@ -146,27 +158,37 @@ class ElementDisplayOnPage(BaseExpectation):
                                 self.scroll_into_view(driver, proportion(center(r["COOR"]), self.get_body_size(driver), shape))
                                 return False
                             else:
-                                return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
+                                if self.multiple:
+                                    self.elements.append(proportion(center(r["COOR"]), self.get_viewport_size(driver), shape))
+                                else:
+                                    return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
                 else:
                     if self.FULL_SCREEN:
                         self.FULL_SCREEN = False
                         self.scroll_into_view(driver, proportion(center(r["COOR"]), self.get_body_size(driver), shape))
                         return False
                     else:
-                        return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
+                        if self.multiple:
+                            self.elements.append(proportion(center(r["COOR"]), self.get_viewport_size(driver), shape))
+                        else:
+                            return proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
         self.FULL_SCREEN = True
         # raise NotVisibleException("text NOT visible")
+        if len(self.elements) > 0:
+            return self.elements
         return False
 
 
 class ElementMatchOnPage(BaseExpectation):
 
-    def __init__(self, model, element, keyword, direction):
+    def __init__(self, model, element, keyword, direction, multiple=False):
         super().__init__()
         self.model = model
         self.element = element.lower()
         self.keyword = keyword
         self.direction = direction.lower() if direction else "down"
+        self.multiple = multiple
+        self.elements = []
 
     def __call__(self, driver):
         if self.FULL_SCREEN:
@@ -231,21 +253,39 @@ class ElementMatchOnPage(BaseExpectation):
                 if not matched_element:
                     distance = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
                     matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
+                    if self.multiple:
+                        self.elements.append(matched_element)
                 else:
                     temp = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
                     if temp < distance:
                         matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
                         distance = temp
+                        if self.multiple:
+                            self.elements.insert(0, matched_element)
+                    else:
+                        if self.multiple:
+                            matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
+                            self.elements.append(matched_element)
         if not matched_element:
             for inx, e in enumerate(relative_elements[self.direction]["edge"]):
                 position = proportion(center(e), self.get_viewport_size(driver), shape)
                 if not matched_element:
                     distance = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
                     matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
+                    if self.multiple:
+                        self.elements.append(matched_element)
                 else:
                     temp = (position[0] - match_keyword[0]) ** 2 + (position[1] - match_keyword[1]) ** 2
                     if temp < distance:
                         matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
                         distance = temp
+                        if self.multiple:
+                            self.elements.insert(0, matched_element)
+                    else:
+                        if self.multiple:
+                            matched_element = proportion(center(relative_elements[self.direction]["area"][inx]), self.get_viewport_size(driver), shape)
+                            self.elements.append(matched_element)
         self.FULL_SCREEN = False
+        if len(self.elements) > 0:
+            return self.elements
         return matched_element
