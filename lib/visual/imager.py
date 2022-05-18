@@ -64,8 +64,11 @@ class Imager:
     def recognize_crop_contours(cls, img, crop, expand=20):
         result = cls.crop_contours(img, crop)
         if result == "":
-            crop = (crop[0]-expand, crop[1]-expand, crop[2]+expand, crop[3]+expand)
-            return cls.crop_contours(img, crop)
+            try:
+                crop = (crop[0]-expand, crop[1]-expand, crop[2]+expand, crop[3]+expand)
+                return cls.crop_contours(img, crop)
+            except TypeError:
+                return result
         else:
             return result
 
