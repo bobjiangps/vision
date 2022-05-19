@@ -4,10 +4,11 @@ import re
 
 class TextField(ElementBase):
 
-    def __init__(self, keyword=None, direction=None):
+    def __init__(self, keyword=None, direction=None, refer=None):
         super().__init__()
         self.keyword = keyword
         self.direction = direction
+        self.refer = refer
         self.element_type = "_".join(re.findall("[A-Z][^A-Z]*", self.__class__.__mro__[-3].__qualname__))
 
     def input(self, value, *args):

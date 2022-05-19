@@ -3,9 +3,10 @@ from lib.elements.base import ElementBase
 
 class Static(ElementBase):
 
-    def __init__(self, text):
+    def __init__(self, text, refer=None):
         super().__init__()
         self.text = text
+        self.refer = refer
         self.element_type = self.__class__.__mro__[-3].__qualname__
         self.beyond = False
 
