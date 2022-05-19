@@ -146,6 +146,40 @@ class WebAction(CustomWait):
                     if timeout == self.timeout else \
                     CustomWait(self._driver, timeout).until(ElementDisplayOnPage(model, element, keyword, multiple=True), message)
 
+    def wait_until_element_by_region_display(self, instance, timeout=default_timeout):
+        if isinstance(self._model, list):
+            model = self._model[1] if hasattr(instance, "category") else self._model[0]
+        else:
+            model = self._model
+        if instance.text:
+            keyword = instance.text
+        else:
+            keyword = instance.keyword
+        element = instance.category if hasattr(instance, "category") else instance.element_type
+        refer = instance.refer
+        self.log.info(f"Wait the element [{element}] referred by [{instance.refer}] to display")
+        message = f"cannot see --{element}-- referred by --{instance.refer}-- on page after wait {timeout} seconds"
+        return self.until(ElementByRegionDisplayOnPage(model, element, refer, keyword), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until(ElementByRegionDisplayOnPage(model, element, refer, keyword), message)
+
+    def wait_until_element_by_region_disappear(self, instance, timeout=default_timeout):
+        if isinstance(self._model, list):
+            model = self._model[1] if hasattr(instance, "category") else self._model[0]
+        else:
+            model = self._model
+        if instance.text:
+            keyword = instance.text
+        else:
+            keyword = instance.keyword
+        element = instance.category if hasattr(instance, "category") else instance.element_type
+        refer = instance.refer
+        self.log.info(f"Wait the element [{element}] referred by [{instance.refer}] to disappear")
+        message = f"still see --{element}-- referred by --{instance.refer}-- on page after wait {timeout} seconds"
+        return self.until_not(ElementByRegionDisplayOnPage(model, element, refer, keyword), message) \
+            if timeout == self.timeout else \
+            CustomWait(self._driver, timeout).until_not(ElementByRegionDisplayOnPage(model, element, refer, keyword), message)
+
     def click(self, element):
         self.log.info("Perform click on the element")
         self.action_builder.pointer_action.move_to_location(element[0], element[1])
