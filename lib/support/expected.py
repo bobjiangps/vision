@@ -289,3 +289,75 @@ class ElementMatchOnPage(BaseExpectation):
         if len(self.elements) > 0:
             return self.elements
         return matched_element
+
+
+class ElementByRegionDisplayOnPage(BaseExpectation):
+    # incomplete
+
+    def __init__(self, model, element, refer, keyword=None, multiple=False):
+        super().__init__()
+        self.model = model
+        self.element = element.lower()
+        self.refer = refer
+        self.keyword = keyword
+        self.text = keyword if self.element in ["static"] else None
+        self.multiple = multiple
+        self.elements = []
+
+    def __call__(self, driver):
+        if self.FULL_SCREEN:
+            self.save_full_screenshot(driver)
+        else:
+            driver.save_screenshot(self._img)
+        refer_position = None
+        contours, shape = Imager.recognize_contours(self._img)
+        for c in contours:
+            if c[1].find(self.refer) >= 0 or qualified(c[1], self.refer):
+                if self.FULL_SCREEN:
+                    self.FULL_SCREEN = False
+                    self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
+                    return False
+                else:
+                    refer_position = proportion(center(c[0]), self.get_viewport_size(driver), shape)
+                    break
+        if not refer_position:
+            self.FULL_SCREEN = True
+            return False
+        else:
+            texts_y_in_column = []
+            refer_js_rect = driver.execute_script(f"return document.elementFromPoint({refer_position[0]}, {refer_position[1]}).getClientRects()[0];")
+            for c in contours:
+                temp_position = proportion(center(c[0]), self.get_viewport_size(driver), shape)
+                temp_js_rect = driver.execute_script(f"return document.elementFromPoint({temp_position[0]}, {temp_position[1]}).getClientRects()[0];")
+                if refer_js_rect["left"] == temp_js_rect["left"] and refer_js_rect["height"] == temp_js_rect["height"]:
+                    texts_y_in_column.append(temp_js_rect["y"])
+            texts_y_in_column.sort()
+            amounts = len(texts_y_in_column)
+            y_range = ()
+            if amounts > 1:
+                for inx, y in enumerate(texts_y_in_column):
+                    if y == refer_js_rect["y"]:
+                        if inx == (amounts - 1):
+                            y_range = (y-20, self.get_viewport_size(driver)[1])
+                        else:
+                            y_range = (y-20, texts_y_in_column[inx+1]-20)
+                if self.text is not None:
+                    temp_elements = TextDisplayOnPage(self.text, multiple=True)(driver)
+                else:
+                    temp_elements = ElementDisplayOnPage(self.model, self.element, self.keyword, multiple=True)(driver)
+                if temp_elements:
+                    elements_by_region = []
+                    for e in temp_elements:
+                        if y_range[0] <= e[1] <= y_range[1]:
+                            if self.multiple:
+                                elements_by_region.append(e)
+                            else:
+                                return e
+                    return elements_by_region
+                else:
+                    return False
+            else:
+                if self.text:
+                    return TextDisplayOnPage(self.text, self.multiple)(driver)
+                else:
+                    return ElementDisplayOnPage(self.model, self.element, self.keyword, self.multiple)(driver)
