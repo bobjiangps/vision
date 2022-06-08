@@ -1,6 +1,11 @@
 from paddleocr import PaddleOCR
 from lib.singleton import Singleton
+from conf.config import LoadConfig
+from pathlib import Path
+import zipfile
 import cv2
+import shutil
+import requests
 
 
 class Imager(Singleton):
@@ -19,7 +24,6 @@ class Imager(Singleton):
                 img2 = img[r[0][0][1] + 20:r[0][2][1] - 20, r[0][0][0] + 20:r[0][2][0] - 20]
                 for r2 in cls._PO.ocr(img2, cls=False):
                     results.insert(-1, ((r2[0][0][0], r2[0][0][1], r2[0][2][0], r2[0][2][1]), r2[1][0]))
-        print(results)
         return results, img.shape
 
     @classmethod
@@ -43,8 +47,28 @@ class Imager(Singleton):
         return cls._PO.ocr(crop_img, cls=False)[0][1][0]
 
     @classmethod
-    def activate_po(cls):
-        cls._PO = PaddleOCR(use_angle_cls=False, lang="en", show_log=False)
+    def activate_po(cls, lang_code="en", latest=False, remove=False):
+        if latest:
+            cls._PO = PaddleOCR(use_angle_cls=False, lang=lang_code, show_log=False)
+            return True
+        resource_folder = Path.cwd().joinpath("resource", "paddle")
+        if remove and resource_folder.exists():
+            shutil.rmtree(resource_folder)
+        if not resource_folder.exists():
+            r = requests.get(f"{LoadConfig().remote}/ocr/paddle.zip")
+            temp = Path.cwd().joinpath("resource", "paddle.zip")
+            if r.status_code == 200:
+                with open(temp, "wb") as f:
+                    f.write(r.content)
+                with zipfile.ZipFile(str(temp), "r") as z:
+                    z.extractall(str(Path.cwd().joinpath("resource")))
+                temp.unlink()
+        cls._PO = PaddleOCR(use_angle_cls=False,
+                            lang=lang_code,
+                            show_log=False,
+                            cls_model_dir=str(Path.cwd().joinpath("resource", "paddle", "cls", "ch_ppocr_mobile_v2.0_cls_infer")),
+                            det_model_dir=str(Path.cwd().joinpath("resource", "paddle", "det", lang_code, "en_PP-OCRv3_det_infer")),
+                            rec_model_dir=str(Path.cwd().joinpath("resource", "paddle", "rec", lang_code, "en_PP-OCRv3_rec_infer")))
 
 
 # import cv2

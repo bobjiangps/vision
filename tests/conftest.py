@@ -2,6 +2,7 @@ from lib.test_base.conftest import *
 from lib.elements import ElementBase
 from lib.non_ai_elements import NonAiElementBase
 from lib.test_base.page_base import PageBase
+from lib.visual.imager import Imager
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -19,8 +20,10 @@ def web(logger):
             pass
     driver = SeleniumUtils.get_driver(command_data["browser"])
     action = WebAction(driver, getattr(pytest, "model"), logger)
+    logger.info("Prepare resources in new machine only once.......")
     ElementBase.set_action(action)
     NonAiElementBase.set_action(action)
+    Imager.activate_po()
     setattr(PageBase, "_driver", driver)
     setattr(PageBase, "action", action)
     setattr(PageBase, "log", logger)
