@@ -45,7 +45,7 @@ class Imager(Singleton):
         img = cv2.imread(img)
         crop_img = img[crop[1]:crop[3], crop[0]:crop[2]].copy()
         r = cls._PO.ocr(crop_img, cls=False)
-        return r[0][1][0] if len(r) > 1 else ""
+        return r[0][1][0] if len(r) > 0 else ""
 
     @classmethod
     def activate_po(cls, lang_code="en", latest=False, remove=False):
