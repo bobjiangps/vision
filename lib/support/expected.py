@@ -152,6 +152,8 @@ class ElementDisplayOnPage(BaseExpectation):
                         if not tmp:
                             (x, y) = proportion(center(r["COOR"]), self.get_viewport_size(driver), shape)
                             tmp = driver.execute_script(f"return document.elementFromPoint({x}, {y});").text
+                            if tmp.find("\n") > 0:
+                                continue
                         if tmp.find(k.strip()) >= 0 or qualified(tmp, k):
                             if self.FULL_SCREEN:
                                 self.FULL_SCREEN = False
