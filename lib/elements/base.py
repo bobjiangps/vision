@@ -23,22 +23,22 @@ class ElementBase:
         # or
         return type(self)(self._offset, self.text, self.element_type, self.keyword)
 
-    def element(self, timeout=default_timeout):
+    def element(self, timeout=None):
         if self.refer:
             return self._action.wait_until_element_by_region_display(self, timeout)
         else:
             return self._action.wait_until_display(self, timeout)
 
-    def elements(self, timeout=default_timeout):
+    def elements(self, timeout=None):
         return self._action.wait_until_elements_display(self, timeout)
 
-    def wait_element_visible(self, timeout=default_timeout):
+    def wait_element_visible(self, timeout=None):
         if self.refer:
             return self._action.wait_until_element_by_region_display(self, timeout)
         else:
             return self._action.wait_until_display(self, timeout)
 
-    def wait_element_invisible(self, timeout=default_timeout):
+    def wait_element_invisible(self, timeout=None):
         if self.refer:
             return self._action.wait_until_element_by_region_disappear(self, timeout)
         else:

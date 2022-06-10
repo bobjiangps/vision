@@ -21,7 +21,9 @@ class WebAction(CustomWait):
         self.log = logger
         self.timeout = timeout
 
-    def wait_until_display(self, instance, timeout=default_timeout):
+    def wait_until_display(self, instance, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         if instance.beyond:
             return self.wait_until_element_match(instance, timeout)
         else:
@@ -30,7 +32,9 @@ class WebAction(CustomWait):
             else:
                 return self.wait_until_element_display(instance, timeout)
 
-    def wait_until_disappear(self, instance, timeout=default_timeout):
+    def wait_until_disappear(self, instance, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         if instance.beyond:
             return self.wait_until_element_match_disappear(instance, timeout)
         else:
@@ -39,19 +43,25 @@ class WebAction(CustomWait):
             else:
                 return self.wait_until_element_disappear(instance, timeout)
 
-    def wait_until_text_display(self, text, timeout=default_timeout):
+    def wait_until_text_display(self, text, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         self.log.info(f"Wait the text [{text}] to display")
         return self.until(TextDisplayOnPage(text), f"cannot see --{text}-- on page after wait {timeout} seconds") \
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
 
-    def wait_until_text_disappear(self, text, timeout=default_timeout):
+    def wait_until_text_disappear(self, text, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         self.log.info(f"Wait the text [{text}] to disappear")
         return self.until_not(TextDisplayOnPage(text), f"The text --{text}-- still display on page after wait {timeout} seconds") \
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until_not(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
 
-    def wait_until_element_display(self, instance, timeout=default_timeout):
+    def wait_until_element_display(self, instance, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         if isinstance(self._model, list):
             model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
@@ -68,7 +78,9 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(ElementDisplayOnPage(model, element, keyword), message)
 
-    def wait_until_element_disappear(self, instance, timeout=default_timeout):
+    def wait_until_element_disappear(self, instance, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         if isinstance(self._model, list):
             model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
@@ -85,7 +97,9 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until_not(ElementDisplayOnPage(model, element, keyword), message)
 
-    def wait_until_element_match(self, instance, timeout=default_timeout):
+    def wait_until_element_match(self, instance, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         if isinstance(self._model, list):
             model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
@@ -99,7 +113,9 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(ElementMatchOnPage(model, element, keyword, direction), message)
 
-    def wait_until_element_match_disappear(self, instance, timeout=default_timeout):
+    def wait_until_element_match_disappear(self, instance, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         if isinstance(self._model, list):
             model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
@@ -113,7 +129,9 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until_not(ElementMatchOnPage(model, element, keyword, direction), message)
 
-    def wait_until_elements_display(self, instance, timeout=default_timeout):
+    def wait_until_elements_display(self, instance, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         if isinstance(self._model, list):
             model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
@@ -146,7 +164,9 @@ class WebAction(CustomWait):
                     if timeout == self.timeout else \
                     CustomWait(self._driver, timeout).until(ElementDisplayOnPage(model, element, keyword, multiple=True), message)
 
-    def wait_until_element_by_region_display(self, instance, timeout=default_timeout):
+    def wait_until_element_by_region_display(self, instance, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         if isinstance(self._model, list):
             model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
@@ -163,7 +183,9 @@ class WebAction(CustomWait):
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(ElementByRegionDisplayOnPage(model, element, refer, keyword), message)
 
-    def wait_until_element_by_region_disappear(self, instance, timeout=default_timeout):
+    def wait_until_element_by_region_disappear(self, instance, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         if isinstance(self._model, list):
             model = self._model[1] if hasattr(instance, "category") else self._model[0]
         else:
@@ -303,35 +325,45 @@ class WebAction(CustomWait):
     def find_non_ai_elements(self, by, value):
         return self._driver.find_elements(by, value)
 
-    def wait_until_non_ai_element_present(self, by, value, timeout=default_timeout):
+    def wait_until_non_ai_element_present(self, by, value, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         self.log.info(f"Wait the element present by {by}: {value}")
         message = f"Unable to check the element present by {by}: {value} after wait {timeout} seconds"
         return self.until(ec.presence_of_element_located((by, value)), message) \
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(ec.presence_of_element_located((by, value)), message)
 
-    def wait_until_non_ai_element_display(self, by, value, timeout=default_timeout):
+    def wait_until_non_ai_element_display(self, by, value, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         self.log.info(f"Wait the element display by {by}: {value}")
         message = f"Unable to check the element display by {by}: {value} after wait {timeout} seconds"
         return self.until(ec.visibility_of_element_located((by, value)), message) \
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(ec.visibility_of_element_located((by, value)), message)
 
-    def wait_until_non_ai_element_disappear(self, by, value, timeout=default_timeout):
+    def wait_until_non_ai_element_disappear(self, by, value, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         self.log.info(f"Wait the element disappear by {by}: {value}")
         message = f"Unable to check the element disappear by {by}: {value} after wait {timeout} seconds"
         return self.until_not(ec.presence_of_element_located((by, value)), message) \
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until_not(ec.presence_of_element_located((by, value)), message)
 
-    def wait_until_non_ai_element_clickable(self, by, value, timeout=default_timeout):
+    def wait_until_non_ai_element_clickable(self, by, value, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         self.log.info(f"Wait the element clickable by {by}: {value}")
         message = f"Unable to check the element clickable by {by}: {value} after wait {timeout} seconds"
         return self.until(ec.element_to_be_clickable((by, value)), message) \
             if timeout == self.timeout else \
             CustomWait(self._driver, timeout).until(ec.element_to_be_clickable((by, value)), message)
 
-    def wait_until_non_ai_element_selected(self, by, value, timeout=default_timeout):
+    def wait_until_non_ai_element_selected(self, by, value, timeout=None):
+        if not timeout or not isinstance(timeout, int):
+            timeout = self.timeout
         self.log.info(f"Wait the element selected by {by}: {value}")
         message = f"Unable to check the element selected by {by}: {value} after wait {timeout} seconds"
         return self.until(ec.element_located_to_be_selected((by, value)), message) \

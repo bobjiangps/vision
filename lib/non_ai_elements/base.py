@@ -24,19 +24,19 @@ class NonAiElementBase:
     def elements(self):
         return self._action.find_non_ai_elements(self.identify_type, self.identify_value)
 
-    def wait_element_present(self, timeout=default_timeout):
+    def wait_element_present(self, timeout=None):
         return self._action.wait_until_non_ai_element_present(self.identify_type, self.identify_value, timeout)
 
-    def wait_element_visible(self, timeout=default_timeout):
+    def wait_element_visible(self, timeout=None):
         return self._action.wait_until_non_ai_element_display(self.identify_type, self.identify_value, timeout)
 
-    def wait_element_disappear(self, timeout=default_timeout):
+    def wait_element_disappear(self, timeout=None):
         return self._action.wait_until_non_ai_element_disappear(self.identify_type, self.identify_value, timeout)
 
-    def wait_element_clickable(self, timeout=default_timeout):
+    def wait_element_clickable(self, timeout=None):
         return self._action.wait_until_non_ai_element_clickable(self.identify_type, self.identify_value, timeout)
 
-    def wait_element_selected(self, timeout=default_timeout):
+    def wait_element_selected(self, timeout=None):
         return self._action.wait_until_non_ai_element_selected(self.identify_type, self.identify_value, timeout)
 
     def action_click(self, element):
