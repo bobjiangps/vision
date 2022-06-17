@@ -2,6 +2,8 @@ from paddleocr import PaddleOCR
 from lib.singleton import Singleton
 from conf.config import LoadConfig
 from pathlib import Path
+import pytesseract as ptr
+import platform
 import zipfile
 import cv2
 import shutil
@@ -24,7 +26,44 @@ class Imager(Singleton):
                 img2 = img[r[0][0][1] + 20:r[0][2][1] - 20, r[0][0][0] + 20:r[0][2][0] - 20]
                 for r2 in cls._PO.ocr(img2, cls=False):
                     results.insert(-1, ((r2[0][0][0], r2[0][0][1], r2[0][2][0], r2[0][2][1]), r2[1][0]))
+        if len(results) <= 1:
+            contours = cls.contours(img)
+            img_copy = img.copy()
+            results = []
+            for cnt in contours:
+                x, y, w, h = cv2.boundingRect(cnt)
+                cropped = img_copy[y:y + h, x:x + w]
+                s = ptr.image_to_string(cropped).strip()
+                results.append(((x, y, x + w, y + h), s))
+                if len(s) > 120:
+                    img2 = img[y + 20:y + h - 20, x + 20:x + w - 20]
+                    contours2 = cls.contours(img2)
+                    img_copy2 = img2.copy()
+                    for cnt2 in contours2:
+                        x2, y2, w2, h2 = cv2.boundingRect(cnt2)
+                        cropped2 = img_copy2[y2:y2 + h2, x2:x2 + w2]
+                        s2 = ptr.image_to_string(cropped2).strip()
+                        results.insert(-1, ((x + x2 - 20, y + y2 - 20, x + x2 + w2 + 20, y + y2 + h2 + 20), s2))
         return results, img.shape
+
+    @classmethod
+    def contours(cls, img, font="small"):
+        if platform.platform().lower().find("windows") >= 0:
+            ck_size = {
+                "small": (14, 14),
+                "large": (28, 28)
+            }
+        else:
+            ck_size = {
+                "small": (16, 16),
+                "large": (32, 32)
+            }
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        ret, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_OTSU | cv2.THRESH_BINARY_INV)
+        rect_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, ck_size[font.lower()])
+        dilation = cv2.dilate(thresh, rect_kernel, iterations=1)
+        contours, hierarchy = cv2.findContours(dilation, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        return contours
 
     @classmethod
     def recognize_crop_contours(cls, img, crop, expand=10):
