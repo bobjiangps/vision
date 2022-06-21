@@ -23,9 +23,12 @@ class Imager(Singleton):
         for r in cls._PO.ocr(img, cls=False):
             results.append(((r[0][0][0], r[0][0][1], r[0][2][0], r[0][2][1]), r[1][0]))
             if len(r[1][0]) > 120:
-                img2 = img[r[0][0][1] + 20:r[0][2][1] - 20, r[0][0][0] + 20:r[0][2][0] - 20]
-                for r2 in cls._PO.ocr(img2, cls=False):
-                    results.insert(-1, ((r2[0][0][0], r2[0][0][1], r2[0][2][0], r2[0][2][1]), r2[1][0]))
+                try:
+                    img2 = img[r[0][0][1] + 20:r[0][2][1] - 20, r[0][0][0] + 20:r[0][2][0] - 20]
+                    for r2 in cls._PO.ocr(img2, cls=False):
+                        results.insert(-1, ((r2[0][0][0], r2[0][0][1], r2[0][2][0], r2[0][2][1]), r2[1][0]))
+                except TypeError:
+                    pass
         if len(results) <= 1:
             contours = cls.contours(img)
             img_copy = img.copy()
