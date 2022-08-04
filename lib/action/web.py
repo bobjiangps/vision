@@ -107,6 +107,7 @@ class WebAction(CustomWait):
         element = instance.category if hasattr(instance, "category") else instance.element_type
         keyword = instance.keyword
         direction = instance.direction
+        self.wait_until_text_display(keyword)
         message = f"cannot see --{element}-- on page with keyword --{keyword}-- after wait {timeout} seconds"
         self.log.info(f"Wait the element [{element}] which match [{keyword}] to display")
         return self.until(ElementMatchOnPage(model, element, keyword, direction), message) \
@@ -178,6 +179,7 @@ class WebAction(CustomWait):
         element = instance.category if hasattr(instance, "category") else instance.element_type
         refer = instance.refer
         self.log.info(f"Wait the element [{element}] referred by [{instance.refer}] to display")
+        self.wait_until_text_display(refer)
         message = f"cannot see --{element}-- referred by --{instance.refer}-- on page after wait {timeout} seconds"
         return self.until(ElementByRegionDisplayOnPage(model, element, refer, keyword), message) \
             if timeout == self.timeout else \
