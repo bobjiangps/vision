@@ -12,5 +12,6 @@ class StackoverflowSignup(PageBase):
     def only_input_in_text_fields(self):
         self.name_field.input("bob")
         self.email_field.input("test@null.com")
+        self.password_field.input(123456)
         return self
 
