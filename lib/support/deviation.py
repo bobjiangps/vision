@@ -1,4 +1,8 @@
-from lib.compiled.levenshtein import compute
+import platform
+if platform.machine().lower() == "arm64":
+    from lib.compiled.levenshteinm import compute
+else:
+    from lib.compiled.levenshtein import compute
 
 DEGREE = 1
 
