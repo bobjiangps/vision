@@ -19,7 +19,12 @@ class StackoverflowLogin(PageBase):
         return self
 
     def login_without_input_anything(self):
-        self.sign_in_button.click()
+        ele = self.sign_in_button.elements()
+        if len(ele) > 1:
+            self.log.info("multiple elements found")
+            self.action.click(ele[-1])
+        else:
+            self.sign_in_button.click()
         return self
 
     def navigate_to_signup_page(self):

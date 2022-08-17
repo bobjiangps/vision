@@ -39,7 +39,7 @@ def pytest_configure(config):
     logger = logging.getLogger("System")
     logger.info("loading model...")
     # setattr(pytest, "model", init_model())
-    setattr(pytest, "model", init_model(name="element-state-20220809", state=True))
+    setattr(pytest, "model", init_model(name="elements-state", state=True))
     # setattr(pytest, "model", init_model(name="state", remove=True, state=True))
     # em = init_model(name="elements")
     # im = init_model(name="icons")
