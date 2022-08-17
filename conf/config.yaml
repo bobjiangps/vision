@@ -1,7 +1,7 @@
 model:
   weights: elements
   img: page
-  confidence: 0.38
+  confidence: 0.43
   iou: 0.45
   classes:
   agnostic_nms:
@@ -44,7 +44,7 @@ model:
     - [ 30,61, 62,45, 59,119 ]
     - [ 116,90, 156,198, 373,326 ]
   n:
-    ['text_field', 'button', 'checkbox', 'dropdown', 'link', 'radio_button']
+    ['text_field', 'button', 'checkbox', 'dropdown', 'link', 'radio_button', 'switch']
 remote:
   host: 120.78.133.207
   port: 80

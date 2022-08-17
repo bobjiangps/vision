@@ -8,7 +8,7 @@ class StackoverflowLogin(PageBase):
         super().__init__()
         self.accept_cookie_btn = Button("Accept all cookies")
         self.sign_up_btn = Button("Sign up")
-        self.sign_in_button = Button("Log in")
+        self.sign_in_button = Button("Log  in")
         self.email_err_msg = Static("Email cannot be empty")
         self.password_err_msg = Static("Password cannot be empty")
 

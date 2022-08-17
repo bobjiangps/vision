@@ -23,7 +23,7 @@ def load(weights, map_location=None):
     else:
         from lib.visual.model import Model
         # ckpt = Model("yolov5s.yaml", 3, 6, None).to("cpu")
-        ckpt = Model(LoadConfig().model, 3, 6, None).to("cpu")
+        ckpt = Model(LoadConfig().model, 3, 7, None).to("cpu")
         ckpt.load_state_dict(torch.load(weights, map_location=map_location))
         ckpt.eval()
         ckpt.names = LoadConfig().model["n"]
