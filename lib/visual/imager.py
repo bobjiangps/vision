@@ -8,6 +8,7 @@ import zipfile
 import cv2
 import shutil
 import requests
+import numpy as np
 
 
 class Imager(Singleton):
@@ -113,6 +114,23 @@ class Imager(Singleton):
                             det_model_dir=str(Path.cwd().joinpath("resource", "paddle", "det", lang_code, "en_PP-OCRv3_det_infer")),
                             rec_model_dir=str(Path.cwd().joinpath("resource", "paddle", "rec", lang_code, "en_PP-OCRv3_rec_infer")))
 
+    @classmethod
+    def recognize_region(cls, img):
+        image = cv2.imread(img)
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, 0]], np.float32)
+        dst = cv2.filter2D(gray, -1, kernel)
+        canny = cv2.Canny(dst, 30, 200, 1)
+        cnts = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2:]
+        cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+        cnts = list(cnts)
+        cnts.reverse()
+        sorted_region = []
+        for c in cnts:
+            x, y, w, h = cv2.boundingRect(c)
+            if w > 100 and h > 100:
+                sorted_region.append((x, y, x + w, y + h))
+        return sorted_region
 
 # import cv2
 # import pytesseract as ptr
