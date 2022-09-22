@@ -11,6 +11,13 @@ class StackoverflowLogin(PageBase):
         self.sign_in_button = Button("Log  in")
         self.email_err_msg = Static("Email cannot be empty")
         self.password_err_msg = Static("Password cannot be empty")
+        self.retry_source_msg = Static("Retry using another source")
+
+    def check_source_message(self):
+        self.sign_up_btn.wait_element_visible()
+        if self.retry_source_msg.is_visible():
+            self.retry_source_msg.click()
+            self.sign_up_btn.wait_element_visible()
 
     def go_to_login_page_and_accept_cookie(self):
         self.browse_page("https://stackoverflow.com/users/login")

@@ -6,6 +6,7 @@ def test_show_error_message_if_input_nothing_when_login(web):
     web.log.info("go to login page")
     web.log.info("no xpath, no iframe, just define what you have seen")
     login_page = StackoverflowLogin()
+    login_page.check_source_message()
     login_page.go_to_login_page_and_accept_cookie().login_without_input_anything()
     login_page.email_err_msg.wait_element_visible()
     login_page.password_err_msg.wait_element_visible()
