@@ -45,6 +45,7 @@ model:
     - [ 116,90, 156,198, 373,326 ]
   n:
     ['text_field', 'button', 'checkbox', 'dropdown', 'link', 'radio_button']
+  pad:
 remote:
   host: 120.78.133.207
   port: 80

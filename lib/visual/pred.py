@@ -54,7 +54,9 @@ def predict(model, device=torch.device("cpu")):
         t2 = time_synchronized()
         for i, det in enumerate(pred):
             p, s, im0, frame = path, '', im0s.copy(), getattr(dataset, 'frame', 0)
-            shape = im0.shape
+            # shape = im0.shape
+            pad = LoadConfig().model["pad"]
+            shape = (im0.shape[0], im0.shape[1] + pad * 2, im0.shape[2])
             if len(det):
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
                 for *xyxy, conf, cls in reversed(det):
@@ -63,6 +65,6 @@ def predict(model, device=torch.device("cpu")):
                         label_store[names[c]] += 1
                     else:
                         label_store[names[c]] = 1
-                    results.append({"N": names[c], "PR": f"{conf:.2f}", "COOR": (int(xyxy[0]), int(xyxy[1]), int(xyxy[2]), int(xyxy[3]))})
+                    results.append({"N": names[c], "PR": f"{conf:.2f}", "COOR": (int(xyxy[0])+pad, int(xyxy[1]), int(xyxy[2])+pad, int(xyxy[3]))})
             print(f'{s}Predict Done. ({t2 - t1:.3f}s)')
     return results, label_store, shape

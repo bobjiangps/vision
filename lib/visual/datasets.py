@@ -4,6 +4,7 @@ import cv2
 import numpy as np
 from pathlib import Path
 from lib.visual.augment import letterbox
+from conf.config import LoadConfig
 
 
 class LoadImages:
@@ -71,6 +72,12 @@ class LoadImages:
 
         self.count += 1
         img0 = cv2.imread(path)
+
+        pad = self.check_pad(img0)
+        pad = pad if pad < 200 else 200
+        LoadConfig().model["pad"] = pad
+        img0 = img0[:, pad:-pad]
+
         assert img0 is not None, 'Image Not Found ' + path
 
         img = letterbox(img0, self.img_size, stride=self.stride)[0]
@@ -84,6 +91,25 @@ class LoadImages:
     #     self.frame = 0
     #     self.cap = cv2.VideoCapture(path)
     #     self.frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
+
+    @staticmethod
+    def check_pad(image):
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, 0]], np.float32)
+        dst = cv2.filter2D(gray, -1, kernel)
+        canny = cv2.Canny(dst, 30, 200, 1)
+        cnts = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[-2:]
+        cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+        cnts = list(cnts)
+        left = None
+        for c in cnts:
+            x, y, w, h = cv2.boundingRect(c)
+            if left is None:
+                left = x
+            else:
+                if x < left and x != 0:
+                    left = x
+        return left
 
     def __len__(self):
         return self.nf
