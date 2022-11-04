@@ -96,8 +96,10 @@ class TextDisplayOnPage(BaseExpectation):
                         if found:
                             accurate_c = [p for p in c[0]]
                             width = c[0][2] - c[0][0]
-                            accurate_c[0] += width * (c[1].find(self.text.strip()) / len(c[1]))
-                            accurate_c[2] = c[0][0] + width * ((c[1].find(self.text.strip()) + len(self.text.strip())) / len(c[1]))
+                            if c[1].find(self.text.strip()) / len(c[1]) > 0.2:
+                                accurate_c[0] += width * (c[1].find(self.text.strip()) / len(c[1]))
+                            if (c[1].find(self.text.strip()) + len(self.text.strip())) / len(c[1]) < 0.8:
+                                accurate_c[2] = c[0][0] + width * ((c[1].find(self.text.strip()) + len(self.text.strip())) / len(c[1]))
                         else:
                             accurate_c = c[0]
                         if self.multiple:
