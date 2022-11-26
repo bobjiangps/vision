@@ -4,7 +4,7 @@ UI auto test framework based on YOLO to recognize elements, less code, less main
 ---
 Run command to see how to run web test for stackoverflow site, without xpath / id / name, just define what you see:
 
-运行如下命令来查看在stackoverflow网站上执行web自动化的效果，不用写xpath之类的，只描述人眼看到的即可:
+运行如下命令来查看在amazon网站上执行web自动化的效果，不用写xpath之类的，只描述人眼看到的即可:
 >* python main.py -e QA -t test_ai_login -b Chrome
 
 ---
