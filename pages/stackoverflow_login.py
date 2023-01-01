@@ -9,7 +9,7 @@ class StackoverflowLogin(PageBase):
         self.accept_cookie_btn = Button("Accept all cookies")
         self.sign_up_btn = Button("Sign up")
         self.sign_in_button = Button("Log  in")
-        self.email_err_msg = Static("Email cannot be empty")
+        self.email_err_msg = Static("Email and password are required to log in.")
         self.password_err_msg = Static("Password cannot be empty")
         self.retry_source_msg = Static("Retry using another source")
 
@@ -22,7 +22,7 @@ class StackoverflowLogin(PageBase):
     def go_to_login_page_and_accept_cookie(self):
         self.browse_page("https://stackoverflow.com/users/login")
         self.accept_cookie_btn.click()
-        self.accept_cookie_btn.wait_element_invisible()
+        # self.accept_cookie_btn.wait_element_invisible()  # in chine, always load js fail, click on it but cannot make it disappear
         return self
 
     def login_without_input_anything(self):
