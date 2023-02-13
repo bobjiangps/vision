@@ -28,7 +28,7 @@ class WebAction(CustomWait):
             return self.wait_until_element_match(instance, timeout)
         else:
             if instance.text:
-                return self.wait_until_text_display(instance.text, timeout)
+                return self.wait_until_text_display(instance, timeout)
             else:
                 return self.wait_until_element_display(instance, timeout)
 
@@ -39,25 +39,31 @@ class WebAction(CustomWait):
             return self.wait_until_element_match_disappear(instance, timeout)
         else:
             if instance.text:
-                return self.wait_until_text_disappear(instance.text, timeout)
+                return self.wait_until_text_disappear(instance, timeout)
             else:
                 return self.wait_until_element_disappear(instance, timeout)
 
-    def wait_until_text_display(self, text, timeout=None):
+    def wait_until_text_display(self, instance, timeout=None):
+        if isinstance(instance, str):
+            instance = type("T", (object,), {"text": instance})
+        text = instance.text
         if not timeout or not isinstance(timeout, int):
             timeout = self.timeout
         self.log.info(f"Wait the text [{text}] to display")
-        return self.until(TextDisplayOnPage(text), f"cannot see --{text}-- on page after wait {timeout} seconds") \
+        return self.until(TextDisplayOnPage(instance), f"cannot see --{text}-- on page after wait {timeout} seconds") \
             if timeout == self.timeout else \
-            CustomWait(self._driver, timeout).until(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
+            CustomWait(self._driver, timeout).until(TextDisplayOnPage(instance), f"cannot see --{text}-- on page")
 
-    def wait_until_text_disappear(self, text, timeout=None):
+    def wait_until_text_disappear(self, instance, timeout=None):
+        if isinstance(instance, str):
+            instance = type("T", (object,), {"text": instance})
+        text = instance.text
         if not timeout or not isinstance(timeout, int):
             timeout = self.timeout
         self.log.info(f"Wait the text [{text}] to disappear")
-        return self.until_not(TextDisplayOnPage(text), f"The text --{text}-- still display on page after wait {timeout} seconds") \
+        return self.until_not(TextDisplayOnPage(instance), f"The text --{text}-- still display on page after wait {timeout} seconds") \
             if timeout == self.timeout else \
-            CustomWait(self._driver, timeout).until_not(TextDisplayOnPage(text), f"cannot see --{text}-- on page")
+            CustomWait(self._driver, timeout).until_not(TextDisplayOnPage(instance), f"cannot see --{text}-- on page")
 
     def wait_until_element_display(self, instance, timeout=None):
         if not timeout or not isinstance(timeout, int):
@@ -205,14 +211,14 @@ class WebAction(CustomWait):
             CustomWait(self._driver, timeout).until_not(ElementByRegionDisplayOnPage(model, element, refer, keyword), message)
 
     def click(self, element):
-        self.log.info("Perform click on the element")
+        self.log.info(f"Perform click on the element: {element}")
         self.action_builder.pointer_action.move_to_location(element[0], element[1])
         self.action_builder.pointer_action.click()
         self.action_builder.perform()
         self.clear_actions(self.action_builder)
 
     def input(self, element, value):
-        self.log.info(f"Input [{value}] to the element")
+        self.log.info(f"Input [{value}] to the element: {element}")
         self.action_builder.pointer_action.move_to_location(element[0], element[1])
         self.action_builder.pointer_action.click()
         self.action_builder.perform()

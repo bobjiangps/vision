@@ -72,9 +72,10 @@ class BaseExpectation:
 
 class TextDisplayOnPage(BaseExpectation):
 
-    def __init__(self, text, multiple=False):
+    def __init__(self, instance, multiple=False):
         super().__init__()
-        self.text = text
+        self.text = instance if isinstance(instance, str) else instance.text
+        self.full_match = instance.full_match if hasattr(instance, "full_match") else False
         self.multiple = multiple
         self.elements = []
 
@@ -84,51 +85,64 @@ class TextDisplayOnPage(BaseExpectation):
         else:
             driver.save_screenshot(self._img)
         contours, shape = Imager.recognize_contours(self._img)
-        for t in self.text.split("|"):
+        if self.full_match:
             for c in contours:
-                found = c[1].find(t.strip()) >= 0
-                if found or qualified(c[1], t):
+                if c[1] == self.text or qualified(c[1], self.text):
                     if self.FULL_SCREEN:
                         self.FULL_SCREEN = False
                         self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
                         return False
                     else:
-                        if found:
-                            accurate_c = [p for p in c[0]]
-                            width = c[0][2] - c[0][0]
-                            if c[1].find(self.text.strip()) / len(c[1]) > 0.2:
-                                accurate_c[0] += width * (c[1].find(self.text.strip()) / len(c[1]))
-                            if (c[1].find(self.text.strip()) + len(self.text.strip())) / len(c[1]) < 0.8:
-                                accurate_c[2] = c[0][0] + width * ((c[1].find(self.text.strip()) + len(self.text.strip())) / len(c[1]))
-                        else:
-                            accurate_c = c[0]
                         if self.multiple:
-                            self.elements.append(proportion(center(accurate_c), self.get_viewport_size(driver), shape))
+                            self.elements.append(proportion(center(c[0]), self.get_viewport_size(driver), shape))
                         else:
-                            return proportion(center(accurate_c), self.get_viewport_size(driver), shape)
-        words = []
-        double_check = False
-        for t in self.text.split("|"):
-            if t.find(" ") > 0:
-                words.append(t.split(" ")[0])
-        for w in words:
-            if str(contours).find(f"'{w}'") > 0:
-                double_check = True
-                break
-        if double_check:
-            contours, shape = Imager.recognize_contours(self._img, font="large")
+                            return proportion(center(c[0]), self.get_viewport_size(driver), shape)
+        else:
             for t in self.text.split("|"):
                 for c in contours:
-                    if c[1].find(t.strip()) >= 0 or qualified(c[1], t):
+                    found = c[1].find(t.strip()) >= 0
+                    if found or qualified(c[1], t):
                         if self.FULL_SCREEN:
                             self.FULL_SCREEN = False
                             self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
                             return False
                         else:
-                            if self.multiple:
-                                self.elements.append(proportion(center(c[0]), self.get_viewport_size(driver), shape))
+                            if found:
+                                accurate_c = [p for p in c[0]]
+                                width = c[0][2] - c[0][0]
+                                if c[1].find(self.text.strip()) / len(c[1]) > 0.2:
+                                    accurate_c[0] += width * (c[1].find(self.text.strip()) / len(c[1]))
+                                if (c[1].find(self.text.strip()) + len(self.text.strip())) / len(c[1]) < 0.8:
+                                    accurate_c[2] = c[0][0] + width * ((c[1].find(self.text.strip()) + len(self.text.strip())) / len(c[1]))
                             else:
-                                return proportion(center(c[0]), self.get_viewport_size(driver), shape)
+                                accurate_c = c[0]
+                            if self.multiple:
+                                self.elements.append(proportion(center(accurate_c), self.get_viewport_size(driver), shape))
+                            else:
+                                return proportion(center(accurate_c), self.get_viewport_size(driver), shape)
+            words = []
+            double_check = False
+            for t in self.text.split("|"):
+                if t.find(" ") > 0:
+                    words.append(t.split(" ")[0])
+            for w in words:
+                if str(contours).find(f"'{w}'") > 0:
+                    double_check = True
+                    break
+            if double_check:
+                contours, shape = Imager.recognize_contours(self._img, font="large")
+                for t in self.text.split("|"):
+                    for c in contours:
+                        if c[1].find(t.strip()) >= 0 or qualified(c[1], t):
+                            if self.FULL_SCREEN:
+                                self.FULL_SCREEN = False
+                                self.scroll_into_view(driver, proportion(center(c[0]), self.get_body_size(driver), shape))
+                                return False
+                            else:
+                                if self.multiple:
+                                    self.elements.append(proportion(center(c[0]), self.get_viewport_size(driver), shape))
+                                else:
+                                    return proportion(center(c[0]), self.get_viewport_size(driver), shape)
         self.FULL_SCREEN = True
         # raise NotVisibleException("text NOT visible")
         if len(self.elements) > 0:
