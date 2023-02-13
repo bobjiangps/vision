@@ -20,16 +20,37 @@ class Imager(Singleton):
         if not cls._PO:
             cls.activate_po()
         img = cv2.imread(img)
+        h, w = img.shape[:2]
         results = []
-        for r in cls._PO.ocr(img, cls=False):
-            results.append(((r[0][0][0], r[0][0][1], r[0][2][0], r[0][2][1]), r[1][0]))
-            if len(r[1][0]) > 120:
-                try:
-                    img2 = img[r[0][0][1] + 20:r[0][2][1] - 20, r[0][0][0] + 20:r[0][2][0] - 20]
-                    for r2 in cls._PO.ocr(img2, cls=False):
-                        results.insert(-1, ((r2[0][0][0], r2[0][0][1], r2[0][2][0], r2[0][2][1]), r2[1][0]))
-                except TypeError:
-                    pass
+        slicing = LoadConfig().model["slicing"]
+        if not slicing["status"] or slicing["line"] >= h:
+            for r in cls._PO.ocr(img, cls=False):
+                results.append(((r[0][0][0], r[0][0][1], r[0][2][0], r[0][2][1]), r[1][0]))
+                if len(r[1][0]) > 120:
+                    try:
+                        img2 = img[r[0][0][1] + 20:r[0][2][1] - 20, r[0][0][0] + 20:r[0][2][0] - 20]
+                        for r2 in cls._PO.ocr(img2, cls=False):
+                            results.insert(-1, ((r2[0][0][0], r2[0][0][1], r2[0][2][0], r2[0][2][1]), r2[1][0]))
+                    except TypeError:
+                        pass
+        else:
+            hline = slicing["line"]
+            margin = slicing["margin"]
+            slices = int(h/hline) + 1
+            pors = []
+            for seq in range(slices):
+                if seq == 0:
+                    pors.append(cls._PO.ocr(img[0:hline, :], cls=False))
+                elif (seq + 1) < slices:
+                    pors.append(cls._PO.ocr(img[(hline*seq-margin):(hline*(seq+1)), :], cls=False))
+                else:
+                    pors.append(cls._PO.ocr(img[(hline*seq-margin):h, :], cls=False))
+            for index, p in enumerate(pors):
+                for r in p[0] if platform.platform().find("Linux") >= 0 else p:
+                    if index == 0:
+                        results.append(((r[0][0][0], r[0][0][1], r[0][2][0], r[0][2][1]), r[1][0]))
+                    else:
+                        results.append(((r[0][0][0], r[0][0][1]+index*hline-margin, r[0][2][0], r[0][2][1]+index*hline-margin), r[1][0]))
         if len(results) <= 1:
             contours = cls.contours(img)
             img_copy = img.copy()

@@ -46,6 +46,11 @@ model:
   n:
     ['text_field', 'button', 'checkbox', 'dropdown', 'link', 'radio_button']
   pad:
+  coefficient: 0.1
+  slicing:
+    status: false
+    line: 480
+    margin: 20
 remote:
   host: 120.78.133.207
   port: 80
