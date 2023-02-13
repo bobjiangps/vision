@@ -9,7 +9,7 @@ class StackoverflowLogin(PageBase):
         self.accept_cookie_btn = Button("Accept all cookies")
         self.sign_up_btn = Button("Sign up")
         self.sign_in_button = Button("Log  in")
-        self.email_err_msg = Static("Email and password are required to log in.")
+        self.email_err_msg = Static("Email cannot be empty")
         self.password_err_msg = Static("Password cannot be empty")
         self.retry_source_msg = Static("Retry using another source")
 
