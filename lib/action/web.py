@@ -267,6 +267,12 @@ class WebAction(CustomWait):
             self.action_chains.send_keys(keys[key]).perform()
             self.clear_actions(self.action_chains)
 
+    def move_to_element(self, element):
+        self.log.info(f"Move to the element: {element}")
+        self.action_builder.pointer_action.move_to_location(element[0], element[1])
+        self.action_builder.perform()
+        self.clear_actions(self.action_builder)
+
     def is_displayed(self, instance):
         if isinstance(self._model, list):
             model = self._model[1] if hasattr(instance, "category") else self._model[0]

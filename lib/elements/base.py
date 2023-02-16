@@ -60,5 +60,9 @@ class ElementBase:
     def action_send_value(self, element, value):
         self._action.send_value((element[0] + self._offset[0], element[1] + self._offset[1]), value)
 
+    def move_to(self, *args):
+        element = self.wait_element_visible()
+        self.action.move_to_element(element)
+
     def is_visible(self):
         return self._action.is_displayed(self)
