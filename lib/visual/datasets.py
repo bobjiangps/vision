@@ -76,7 +76,8 @@ class LoadImages:
         pad = self.check_pad(img0)
         pad = pad if pad < 200 else 200
         LoadConfig().model["pad"] = pad
-        img0 = img0[:, pad:-pad]
+        if pad > 0:
+            img0 = img0[:, pad:-pad]
 
         assert img0 is not None, 'Image Not Found ' + path
 
