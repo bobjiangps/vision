@@ -330,6 +330,23 @@ class WebAction(CustomWait):
                     y += 10
         return [x, y], body
 
+    def drag_and_drop(self, element, to):
+        self.log.info("Drag element to specific field")
+        ActionChains(self._driver).drag_and_drop(element, to).perform()
+
+    def drag_and_drop_by_css(self, css_from, css_to):
+        self.log.info(f"Drag {css_from} to {css_to}")
+        with open(str(Path(__file__).absolute().parent.parent.parent.joinpath("utils", "drag_and_drop.js")), "r") as f:
+            drag_js = f.read()
+            try:
+                self._driver.execute_script(drag_js + "$('%s').simulateDragDrop({ dropTarget: '%s'});" % (css_from, css_to))
+            except Exception as e:
+                if str(e).find("jQuery is not defined"):
+                    with open(str(Path(__file__).absolute().parent.parent.parent.joinpath("utils", "jquery.min.js")), "r") as f:
+                        jquery = f.read()
+                        self._driver.execute_script(jquery)
+                    self._driver.execute_script(drag_js + "$('%s').simulateDragDrop({ dropTarget: '%s'});" % (css_from, css_to))
+
     def find_non_ai_element_by_coordinates(self, x, y):
         return self._driver.execute_script(f"return document.elementFromPoint({x}, {y});")
 
