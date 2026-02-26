@@ -1,1 +1,3 @@
 python setup.py build_ext --inplace
+
+wget https://mirrors.huaweicloud.com/python/3.13.7/Python-3.13.7.tar.xz -P $(pyenv root)/cache
