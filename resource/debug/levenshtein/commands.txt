@@ -1,5 +1,5 @@
 python setup.py build_ext --inplace
 
-linux: wget https://mirrors.huaweicloud.com/python/3.13.7/Python-3.13.7.tar.xz -P $(pyenv root)/cache
+linux: wget https://mirrors.tuna.tsinghua.edu.cn/python/3.14.7/Python-3.14.7.tar.xz -P $(pyenv root)/cache
 
 windows: download python install file from python.org such as 3.14.7, then copy to C:\Users\bob\.pyenv\pyenv-win\install_cache
